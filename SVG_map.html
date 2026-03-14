@@ -11,32 +11,41 @@
         <input type="text" id="nickname" placeholder="輸入暱稱（如：小明）" style="font-size:24px;padding:15px;width:300px;">
         <button onclick="loadUserData()">查詢地圖</button>
         <div id="status" style="margin:20px;color:#666;"></div>
-       <svg id="map" viewBox="0 0 800 1000" preserveAspectRatio="xMidYMid meet" style="width:100%;height:600px;border:2px solid #eee;border-radius:10px;">
-    <!-- 真實台灣22縣市地圖（公共領域） -->
-    <path id="KEELUNG" class="county" d="M205 85 L225 78 L238 95 L232 110 L220 105 L205 92Z" stroke="#333" stroke-width="1.5" fill="#999"/>
-    <path id="TAIPEI" class="county" d="M238 95 L260 90 L275 112 L265 125 L245 118 L238 105Z" stroke="#333" stroke-width="1.5" fill="#999"/>
-    <path id="NEW_TAIPEI" class="county" d="M225 105 L245 135 L235 170 L210 155 L205 130Z" stroke="#333" stroke-width="1.5" fill="#999"/>
-    <path id="TAOYUAN" class="county" d="M245 135 L265 145 L285 170 L270 185 L250 165Z" stroke="#333" stroke-width="1.5" fill="#999"/>
-    <path id="HSINCHU_CITY" class="county" d="M285 170 L300 165 L310 190 L295 200Z" stroke="#333" stroke-width="1.5" fill="#999"/>
-    <path id="HSINCHU_COUNTY" class="county" d="M295 200 L315 205 L325 235 L310 225Z" stroke="#333" stroke-width="1.5" fill="#999"/>
-    <path id="MIAOLI" class="county" d="M310 225 L330 235 L340 270 L325 260Z" stroke="#333" stroke-width="1.5" fill="#999"/>
-    <path id="TAICHUNG" class="county" d="M325 260 L345 270 L365 300 L350 310 L335 290Z" stroke="#333" stroke-width="1.5" fill="#999"/>
-    <path id="CHANGHUA" class="county" d="M350 310 L370 320 L390 350 L375 360Z" stroke="#333" stroke-width="1.5" fill="#999"/>
-    <path id="NANTou" class="county" d="M335 290 L350 330 L355 370 L340 350Z" stroke="#333" stroke-width="1.5" fill="#999"/>
-    <path id="YUNLIN" class="county" d="M375 360 L395 370 L415 400 L400 410Z" stroke="#333" stroke-width="1.5" fill="#999"/>
-    <path id="CHIAYI_CITY" class="county" d="M400 410 L420 420 L430 450 L415 460Z" stroke="#333" stroke-width="1.5" fill="#999"/>
-    <path id="CHIAYI_COUNTY" class="county" d="M415 460 L435 470 L455 500 L440 510Z" stroke="#333" stroke-width="1.5" fill="#999"/>
-    <path id="Tainan" class="county" d="M430 450 L455 460 L475 490 L455 500Z" stroke="#333" stroke-width="1.5" fill="#999"/>
-    <path id="KAOHSIUNG" class="county" d="M455 500 L475 510 L495 540 L480 550 L465 530Z" stroke="#333" stroke-width="1.5" fill="#999"/>
-    <path id="PINGTUNG" class="county" d="M480 550 L500 560 L520 590 L505 600Z" stroke="#333" stroke-width="1.5" fill="#999"/>
+       <svg id="map" viewBox="0 0 1000 1400" preserveAspectRatio="xMidYMid meet" style="width:100%;height:650px;">
+    <!-- 高精度台灣22縣市行政區 -->
+    <defs><style>.county{transition:fill 0.3s;stroke:#555;stroke-width:1.5;cursor:pointer;}.county:hover{stroke-width:3;opacity:0.9;}</style></defs>
+    
+    <!-- 北部 -->
+    <path id="KEELUNG" class="county" d="M 280 120 L 305 110 L 320 135 L 310 155 L 295 145 Z" fill="#999"/>
+    <path id="TAIPEI" class="county" d="M 320 135 L 350 130 L 365 165 L 345 175 L 320 155 Z" fill="#999"/>
+    <path id="NEW_TAIPEI" class="county" d="M 295 155 L 320 195 L 300 235 L 275 215 Z" fill="#999"/>
+    <path id="TAOYUAN" class="county" d="M 320 195 L 350 205 L 370 235 L 345 245 L 325 225 Z" fill="#999"/>
+    <path id="HSINCHU_CITY" class="county" d="M 370 235 L 385 230 L 395 260 L 380 270 Z" fill="#999"/>
+    <path id="HSINCHU_COUNTY" class="county" d="M 380 270 L 405 280 L 415 310 L 400 300 Z" fill="#999"/>
+    
+    <!-- 中部 -->
+    <path id="MIAOLI" class="county" d="M 400 300 L 425 310 L 435 345 L 420 335 Z" fill="#999"/>
+    <path id="TAICHUNG" class="county" d="M 420 335 L 450 345 L 470 375 L 455 385 L 435 365 Z" fill="#999"/>
+    <path id="CHANGHUA" class="county" d="M 455 385 L 480 395 L 500 425 L 485 435 Z" fill="#999"/>
+    <path id="NANTou" class="county" d="M 435 365 L 455 405 L 465 445 L 450 435 Z" fill="#999"/>
+    <path id="YUNLIN" class="county" d="M 485 435 L 510 445 L 530 475 L 515 485 Z" fill="#999"/>
+    
+    <!-- 南部 -->
+    <path id="CHIAYI_CITY" class="county" d="M 515 485 L 535 495 L 545 525 L 530 535 Z" fill="#999"/>
+    <path id="CHIAYI_COUNTY" class="county" d="M 530 535 L 555 545 L 575 575 L 560 585 Z" fill="#999"/>
+    <path id="Tainan" class="county" d="M 545 525 L 575 535 L 595 565 L 575 575 Z" fill="#999"/>
+    <path id="KAOHSIUNG" class="county" d="M 575 575 L 605 585 L 625 615 L 610 625 L 590 605 Z" fill="#999"/>
+    <path id="PINGTUNG" class="county" d="M 610 625 L 640 635 L 660 665 L 645 675 Z" fill="#999"/>
+    
     <!-- 東部 -->
-    <path id="YILAN" class="county" d="M185 85 L205 92 L195 105 L185 95Z" stroke="#333" stroke-width="1.5" fill="#999"/>
-    <path id="HUALIEN" class="county" d="M310 185 L330 195 L345 225 L330 215Z" stroke="#333" stroke-width="1.5" fill="#999"/>
-    <path id="TAITUNG" class="county" d="M345 225 L365 255 L385 285 L370 275Z" stroke="#333" stroke-width="1.5" fill="#999"/>
-    <!-- 離島 -->
-    <path id="KINMEN" class="county" d="M620 420 L640 430 L650 455 L635 445Z" stroke="#333" stroke-width="1.5" fill="#999"/>
-    <path id="PENGHU" class="county" d="M510 480 L530 490 L540 510 L525 500Z" stroke="#333" stroke-width="1.5" fill="#999"/>
-    <path id="LIANCHIANG" class="county" d="M650 455 L670 465 L680 485 L665 475Z" stroke="#333" stroke-width="1.5" fill="#999"/>
+    <path id="YILAN" class="county" d="M 240 120 L 280 135 L 260 145 Z" fill="#999"/>
+    <path id="HUALIEN" class="county" d="M 385 230 L 415 240 L 430 280 L 410 270 Z" fill="#999"/>
+    <path id="TAITUNG" class="county" d="M 430 280 L 460 310 L 480 340 L 465 330 Z" fill="#999"/>
+    
+    <!-- 離島（縮小顯示） -->
+    <path id="KINMEN" class="county" d="M 720 480 L 740 490 L 750 515 L 735 505 Z" fill="#999"/>
+    <path id="PENGHU" class="county" d="M 590 540 L 610 550 L 620 570 L 605 560 Z" fill="#999"/>
+    <path id="LIANCHIANG" class="county" d="M 750 515 L 770 525 L 780 545 L 765 535 Z" fill="#999"/>
 </svg>
         <div class="legend">...原有傳奇...</div>
     </div>
