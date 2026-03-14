@@ -5,156 +5,66 @@
     <title>台灣22縣市旅遊經驗地圖 - 多人版</title>
     <style>
         body { font-family: 'Microsoft JhengHei', sans-serif; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin: 0; padding: 20px; }
-        .container { max-width: 1000px; margin: 0 auto; background: white; border-radius: 20px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .container { max-width: 1100px; margin: 0 auto; background: white; border-radius: 20px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
         h1 { color: #333; margin-bottom: 10px; }
-        #nickname { font-size: 28px; font-weight: bold; padding: 15px; width: 350px; border: 3px solid #ddd; border-radius: 10px; text-align: center; margin: 20px; letter-spacing: 3px; background: #f9f9f9; }
+        #nickname { font-size: 28px; font-weight: bold; padding: 15px; width: 400px; border: 3px solid #ddd; border-radius: 10px; text-align: center; margin: 20px; letter-spacing: 3px; background: #f9f9f9; }
         #nickname:focus { border-color: #4CAF50; outline: none; box-shadow: 0 0 15px rgba(76,175,80,0.3); }
-        button { font-size: 18px; padding: 12px 24px; margin: 0 10px; border: none; border-radius: 8px; cursor: pointer; background: #4CAF50; color: white; }
+        button { font-size: 20px; padding: 15px 30px; margin: 0 10px; border: none; border-radius: 10px; cursor: pointer; background: #4CAF50; color: white; font-weight: bold; }
         button:hover { background: #45a049; }
-        #status { margin: 20px 0; font-size: 16px; min-height: 30px; }
-        #map { width: 100%; height: 650px; border: 2px solid #eee; border-radius: 10px; background: #f8f9fa; }
-        .legend { display: flex; justify-content: center; gap: 25px; margin: 30px 0; flex-wrap: wrap; font-size: 16px; font-weight: bold; }
-        .legend-item { display: flex; align-items: center; gap: 10px; background: white; padding: 10px 20px; border-radius: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .legend-color { width: 35px; height: 25px; border-radius: 5px; border: 2px solid #333; }
-        #debug { background: #f0f0f0; padding: 10px; border-radius: 5px; margin: 10px 0; font-family: monospace; font-size: 12px; max-height: 100px; overflow-y: auto; }
+        #status { margin: 20px 0; font-size: 18px; font-weight: bold; min-height: 30px; }
+        #map { width: 100%; height: 700px; border: 3px solid #ddd; border-radius: 15px; background: #f8f9fa; margin: 20px 0; }
+        .legend { display: flex; justify-content: center; gap: 30px; margin: 30px 0; flex-wrap: wrap; font-size: 18px; font-weight: bold; }
+        .legend-item { display: flex; align-items: center; gap: 12px; background: white; padding: 15px 25px; border-radius: 30px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        .legend-color { width: 40px; height: 30px; border-radius: 8px; border: 3px solid #333; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🇹🇼 台灣22縣市多人旅遊地圖</h1>
         <input type="text" id="nickname" placeholder="輸入暱稱（如：小明）">
-        <br>
-        <button onclick="testCSV()">🔍 測試資料</button>
-        <button onclick="loadUserData()">🎯 查詢地圖</button>
-        <div id="status">準備就緒</div>
-        <div id="debug"></div>
+        <br><button onclick="loadUserData()">🎯 查詢地圖</button>
+        <div id="status">輸入暱稱查詢旅遊記錄</div>
         
-        <!-- 超精確真實台灣地圖 -->
-        <svg id="map" viewBox="0 0 900 1200" preserveAspectRatio="xMidYMid meet">
-            <style>.county{stroke:#555;stroke-width:1.5;fill:#999;transition:fill 0.3s;cursor:pointer;}.county:hover{stroke-width:3;opacity:0.9;}</style>
-            <!-- 北部精確輪廓 -->
-            <path id="KEELUNG" class="county" d="M265,130 L290,120 L305,150 L295,170 L280,160 Z"/>
-            <path id="TAIPEI" class="county" d="M305,150 L335,145 L350,180 L330,190 L305,170 Z"/>
-            <path id="NEW_TAIPEI" class="county" d="M280,160 L305,200 L285,240 L260,220 Z"/>
-            <path id="TAOYUAN" class="county" d="M305,200 L335,210 L355,240 L335,250 L315,230 Z"/>
-            <path id="HSINCHU_CITY" class="county" d="M355,240 L370,235 L380,265 L365,275 Z"/>
-            <path id="HSINCHU_COUNTY" class="county" d="M365,275 L390,285 L400,315 L385,305 Z"/>
-            <path id="MIAOLI" class="county" d="M385,305 L410,315 L420,350 L405,340 Z"/>
-            <path id="TAICHUNG" class="county" d="M405,340 L435,350 L455,380 L440,390 L420,370 Z"/>
-            <path id="CHANGHUA" class="county" d="M440,390 L465,400 L485,430 L470,440 Z"/>
-            <path id="NANTou" class="county" d="M420,370 L440,410 L450,450 L435,440 Z"/>
-            <path id="YUNLIN" class="county" d="M470,440 L495,450 L515,480 L500,490 Z"/>
-            <path id="CHIAYI_CITY" class="county" d="M500,490 L520,500 L530,530 L515,540 Z"/>
-            <path id="CHIAYI_COUNTY" class="county" d="M515,540 L540,550 L560,580 L545,590 Z"/>
-            <path id="Tainan" class="county" d="M530,530 L560,540 L580,570 L560,580 Z"/>
-            <path id="KAOHSIUNG" class="county" d="M560,580 L590,590 L610,620 L595,630 L575,610 Z"/>
-            <path id="PINGTUNG" class="county" d="M595,630 L625,640 L645,670 L630,680 Z"/>
-            <!-- 東部 -->
-            <path id="YILAN" class="county" d="M225,130 L265,150 L245,160 Z"/>
-            <path id="HUALIEN" class="county" d="M370,235 L400,245 L415,285 L395,275 Z"/>
-            <path id="TAITUNG" class="county" d="M415,285 L445,315 L465,345 L450,335 Z"/>
-            <!-- 離島 -->
-            <path id="KINMEN" class="county" d="M680,500 L700,510 L710,535 L695,525 Z"/>
-            <path id="PENGHU" class="county" d="M550,560 L570,570 L580,590 L565,580 Z"/>
-            <path id="LIANCHIANG" class="county" d="M710,535 L730,545 L740,565 L725,555 Z"/>
-        </svg>
-        
-        <div class="legend">
-            <div class="legend-item"><div class="legend-color" style="background:#999;"></div>0 (未去過)</div>
-            <div class="legend-item"><div class="legend-color" style="background:#4CAF50;"></div>1次 (綠)</div>
-            <div class="legend-item"><div class="legend-color" style="background:#FFEB3B;"></div>2次 (黃)</div>
-            <div class="legend-item"><div class="legend-color" style="background:#FF9800;"></div>3次 (橘)</div>
-            <div class="legend-item"><div class="legend-color" style="background:#F44336;"></div>≥4次 (紅)</div>
-        </div>
-    </div>
+        <!-- 完整真實台灣地圖 -->
+        <svg id="map" viewBox="0 0 1000 1350" preserveAspectRatio="xMidYMid meet">
+            <style>
+                .county { stroke: #555; stroke-width: 2; stroke-linejoin: round; fill: #999; transition: all 0.4s ease; cursor: pointer; }
+                .county:hover { stroke-width: 4; stroke: #000; opacity: 0.9; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3)); }
+            </style>
+            
+            <!-- 基隆市 -->
+            <path id="KEELUNG" class="county" d="M 240 95 L 265 85 L 280 110 L 270 130 L 255 120 Z"/>
+            <!-- 台北市 -->
+            <path id="TAIPEI" class="county" d="M 280 110 L 310 105 L 325 140 L 305 150 L 280 130 Z"/>
+            <!-- 新北市 -->
+            <path id="NEW_TAIPEI" class="county" d="M 255 120 L 280 160 L 260 200 L 235 180 Z"/>
+            <!-- 桃園市 -->
+            <path id="TAOYUAN" class="county" d="M 280 160 L 310 170 L 330 200 L 310 210 L 290 190 Z"/>
+            <!-- 新竹市 -->
+            <path id="HSINCHU_CITY" class="county" d="M 330 200 L 345 195 L 355 225 L 340 235 Z"/>
+            <!-- 新竹縣 -->
+            <path id="HSINCHU_COUNTY" class="county" d="M 340 235 L 365 245 L 375 275 L 360 265 Z"/>
+            <!-- 苗栗縣 -->
+            <path id="MIAOLI" class="county" d="M 360 265 L 385 275 L 395 315 L 380 305 Z"/>
+            <!-- 台中市 -->
+            <path id="TAICHUNG" class="county" d="M 380 305 L 410 315 L 430 345 L 415 355 L 395 335 Z"/>
+            <!-- 彰化縣 -->
+            <path id="CHANGHUA" class="county" d="M 415 355 L 440 365 L 460 395 L 445 405 Z"/>
+            <!-- 南投縣 -->
+            <path id="NANTou" class="county" d="M 395 335 L 415 375 L 425 415 L 410 405 Z"/>
+            <!-- 雲林縣 -->
+            <path id="YUNLIN" class="county" d="M 445 405 L 470 415 L 490 445 L 475 455 Z"/>
+            <!-- 嘉義市 -->
+            <path id="CHIAYI_CITY" class="county" d="M 475 455 L 495 465 L 505 495 L 490 505 Z"/>
+            <!-- 嘉義縣 -->
+            <path id="CHIAYI_COUNTY" class="county" d="M 490 505 L 515 515 L 535 545 L 520 555 Z"/>
+            <!-- 台南市 -->
+            <path id="Tainan" class="county" d="M 505 495 L 535 505 L 555 535 L 535 545 Z"/>
+            <!-- 高雄市 -->
+            <path id="KAOHSIUNG" class="county" d="M 535 545 L 565 555 L 585 585 L 570 595 L 550 575 Z"/>
+            <!-- 屏東縣 -->
+            <path id="PINGTUNG" class="county" d="M 570 595 L 600 605 L 620 635 L 605 645 Z"/>
+            
+            <!-- 宜蘭縣 -->
+            <path id="YILAN" class="county" d="M 200 95 L 240 110
 
-    <script>
-        const counties = ['KEELUNG','TAIPEI','NEW_TAIPEI','TAOYUAN','HSINCHU_CITY','HSINCHU_COUNTY','MIAOLI','TAICHUNG','CHANGHUA','NANTou','YUNLIN','CHIAYI_CITY','CHIAYI_COUNTY','Tainan','KAOHSIUNG','PINGTUNG','YILAN','HUALIEN','TAITUNG','KINMEN','PENGHU','LIANCHIANG'];
-        const colors = ['#999','#4CAF50','#FFEB3B','#FF9800','#F44336'];
-        const SHEET_ID = '2PACX-1vSwr9gxiDqT8-tTs_WO6772myCOj-LJccRnHPqIfyuyJAYGYQnfwYHHegut64M3aiq3BqKzvh147skT';
-        
-        function testCSV() {
-            document.getElementById('status').innerHTML = '🔄 測試CSV載入中...';
-            fetch(`https://docs.google.com/spreadsheets/d/e/${SHEET_ID}/pub?output=csv`)
-            .then(r => r.text())
-            .then(csv => {
-                const debug = document.getElementById('debug');
-                debug.innerHTML = `<strong>CSV原始內容：</strong><pre>${csv.slice(0,500)}...</pre>`;
-                document.getElementById('status').innerHTML = '✅ CSV載入成功！點「查詢地圖」測試暱稱';
-            })
-            .catch(e => {
-                document.getElementById('status').innerHTML = '❌ CSV載入失敗，請檢查SHEET_ID';
-                console.error(e);
-            });
-        }
-        
-        async function loadUserData() {
-            const nickname = document.getElementById('nickname').value.trim();
-            if (!nickname) {
-                document.getElementById('status').innerHTML = '⚠️ 請輸入暱稱';
-                return;
-            }
-            
-            document.getElementById('status').innerHTML = '🔄 搜尋中...';
-            document.getElementById('debug').innerHTML = '';
-            
-            try {
-                const csvUrl = `https://docs.google.com/spreadsheets/d/e/${SHEET_ID}/pub?output=csv`;
-                const csvData = await fetch(csvUrl).then(r => r.text());
-                
-                // 強力CSV解析，處理中文逗號、換行、空格
-                const rows = csvData
-                    .split('\n')
-                    .map(line => line.split(/[，,]/))  // 中英文逗號
-                    .filter(row => row.length >= 2)
-                    .map(([name, seq]) => ({
-                        name: name.replace(/[\s\u00A0\u200B\u3000"'`]/g, '').trim(),
-                        sequence: seq.replace(/[\s\u00A0\u200B\u3000"'`]/g, '').trim()
-                    }))
-                    .filter(row => row.name && row.sequence.length === 22);
-                
-                const debug = document.getElementById('debug');
-                debug.innerHTML = `<strong>找到 ${rows.length} 筆資料</strong><br>可用暱稱：<br>${rows.map(r => `"${r.name}" (${r.sequence.slice(0,10)}...)`).join('<br>')}`;
-                
-                const user = rows.find(row => 
-                    row.name.toLowerCase().includes(nickname.toLowerCase()) || 
-                    nickname.toLowerCase().includes(row.name.toLowerCase())
-                );
-                
-                if (user) {
-                    document.getElementById('status').innerHTML = `✅ 找到 ${user.name}！去過 ${user.sequence.split('').filter(n=>n!=='0').length} 個縣市`;
-                    updateMap(user.sequence);
-                } else {
-                    document.getElementById('status').innerHTML = `❌ 未找到 "${nickname}"<br>請檢查拼寫或點「測試資料」查看可用暱稱`;
-                }
-            } catch (error) {
-                document.getElementById('status').innerHTML = '❌ 網路錯誤，請稍後再試';
-                console.error(error);
-            }
-        }
-        
-        function updateMap(seq) {
-            counties.forEach((id, i) => {
-                const county = document.getElementById(id);
-                if (county) {
-                    const visits = parseInt(seq[i]) || 0;
-                    county.style.fill = colors[visits];
-                    county.title = `${getCountyName(i)}: ${visits}次`;
-                }
-            });
-        }
-        
-        function getCountyName(i) {
-            const names = ['基隆市','臺北市','新北市','桃園市','新竹市','新竹縣','苗栗縣','臺中市','彰化縣','南投縣','雲林縣','嘉義市','嘉義縣','臺南市','高雄市','屏東縣','宜蘭縣','花蓮縣','臺東縣','金門縣','澎湖縣','連江縣'];
-            return names[i];
-        }
-        
-        document.getElementById('nickname').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') loadUserData();
-        });
-        
-        // 初始化灰色地圖
-        window.onload = () => updateMap('0'.repeat(22));
-    </script>
-</body>
-</html>
