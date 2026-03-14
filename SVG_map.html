@@ -1,40 +1,163 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
-
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-	<title>簡易型臺灣地圖圖表製作工具: 可程式化的工具，設定好各縣市的數量顏色資訊後，直接輸出臺灣地圖 SVG</title>
-	<script type="module" src="SVG_map.web.mjs"></script>
-	<script src="https://kanasimi.github.io/CeJS/ce.js"></script>
-
-	<style>
-		#map_options_panel {
-			width: 90%;
-			height: 20em;
-		}
-	</style>
+    <meta charset="utf-8">
+    <title>台灣22縣市旅遊經驗地圖</title>
+    <style>
+        body { 
+            font-family: 'Microsoft JhengHei', sans-serif; 
+            text-align: center; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0; padding: 20px;
+        }
+        .container { max-width: 1000px; margin: 0 auto; background: white; border-radius: 20px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        h1 { color: #333; margin-bottom: 10px; }
+        #input { 
+            font-size: 28px; font-weight: bold; padding: 15px; width: 400px; 
+            border: 3px solid #ddd; border-radius: 10px; text-align: center; 
+            margin: 20px; letter-spacing: 3px; background: #f9f9f9;
+        }
+        #input:focus { border-color: #4CAF50; outline: none; box-shadow: 0 0 15px rgba(76,175,80,0.3); }
+        #map { width: 100%; height: 600px; border: 2px solid #eee; border-radius: 10px; }
+        .legend { 
+            display: flex; justify-content: center; gap: 25px; margin: 30px 0; 
+            flex-wrap: wrap; font-size: 16px; font-weight: bold;
+        }
+        .legend-item { 
+            display: flex; align-items: center; gap: 10px; 
+            background: white; padding: 10px 20px; border-radius: 25px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .legend-color { width: 35px; height: 25px; border-radius: 5px; border: 2px solid #333; }
+        .info { margin: 20px 0; color: #666; font-size: 14px; }
+        @media (max-width: 768px) {
+            #input { width: 300px; font-size: 24px; }
+            .legend { gap: 15px; }
+            #map { height: 400px; }
+        }
+    </style>
 </head>
-
 <body>
-	<object id="original_SVG_file" data="resources/Taiwan map labeled - no town.svg" width="0" height="0" type="image/svg+xml"
-			style="visibility:hidden ;"></object>
+    <div class="container">
+        <h1>🇹🇼 台灣22縣市旅遊經驗地圖</h1>
+        <div class="info">
+            輸入22位數字序列（例：<strong>1234101234101234101234</strong>）<br>
+            每個數字代表對應縣市去過次數：0灰、1綠、2黃、3橘、4紅
+        </div>
+        
+        <input type="text" id="input" maxlength="22" placeholder="輸入22位數字 (0-4)" value="0000000000000000000000">
+        
+        <svg id="map" viewBox="0 0 960 1280" preserveAspectRatio="xMidYMid meet">
+        <!-- 替換整個 <svg id="map"> 部分 -->
+    <path id="KEELUNG" class="county" d="M248,118 L272,110 L288,134 L268,146 L248,134Z"/>
+    <path id="TAIPEI" class="county" d="M288,134 L318,126 L338,158 L318,168 L288,146Z"/>
+    <path id="NEW_TAIPEI" class="county" d="M258,146 L288,178 L268,218 L238,198Z"/>
+    <path id="TAOYUAN" class="county" d="M288,178 L318,188 L338,218 L318,208 L298,188Z"/>
+    <path id="HSINCHU_CITY" class="county" d="M338,218 L358,208 L368,238 L348,248Z"/>
+    <path id="HSINCHU_COUNTY" class="county" d="M348,248 L378,258 L388,288 L368,278Z"/>
+    <path id="MIAOLI" class="county" d="M368,278 L398,288 L408,328 L388,318Z"/>
+    <path id="TAICHUNG" class="county" d="M388,318 L418,328 L438,358 L418,368 L398,348Z"/>
+    <path id="CHANGHUA" class="county" d="M418,368 L448,378 L468,408 L448,418Z"/>
+    <path id="NANTou" class="county" d="M398,348 L418,388 L408,428 L388,408Z"/>
+    <path id="YUNLIN" class="county" d="M448,418 L478,428 L498,458 L478,468Z"/>
+    <path id="CHIAYI_CITY" class="county" d="M478,468 L498,478 L508,508 L488,518Z"/>
+    <path id="CHIAYI_COUNTY" class="county" d="M488,518 L518,528 L538,558 L518,568Z"/>
+    <path id="Tainan" class="county" d="M508,508 L538,518 L558,548 L538,558Z"/>
+    <path id="KAOHSIUNG" class="county" d="M538,558 L568,568 L588,598 L568,608 L548,588Z"/>
+    <path id="PINGTUNG" class="county" d="M568,608 L598,618 L618,648 L598,658Z"/>
+    <path id="YILAN" class="county" d="M188,118 L248,134 L228,124Z"/>
+    <path id="HUALIEN" class="county" d="M368,188 L398,198 L418,238 L398,228Z"/>
+    <path id="TAITUNG" class="county" d="M418,238 L448,268 L468,298 L448,288Z"/>
+    <path id="KINMEN" class="county" d="M658,488 L678,498 L688,518 L668,508Z"/>
+    <path id="PENGHU" class="county" d="M588,538 L608,548 L618,568 L598,558Z"/>
+    <path id="LIANCHIANG" class="county" d="M688,518 L708,528 L718,548 L698,538Z"/>
+        </svg>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background:#999;"></div>
+                0 (未去過)
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background:#4CAF50;"></div>
+                1次 (綠)
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background:#FFEB3B;"></div>
+                2次 (黃)
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background:#FF9800;"></div>
+                3次 (橘)
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background:#F44336;"></div>
+                ≥4次 (紅)
+            </div>
+        </div>
+    </div>
 
-
-	<div id="loading_panel">Loading... (請等待最多1分鐘以載入程式庫與地圖)</div>
-	<div id="main_panel" style="display:none;">
-		請按 CSV 或 TSV 格式，依序順序輸入 <b>縣市名稱, 要顯示的 label文字, 縣市區塊背景顏色, label文字顏色</b>。TSV 中間以 tab 分隔，請先在別處打好複製過來。<br />
-		每個縣市一行：
-		<!-- @see convert_map_options() --><br />
-		<textarea id="map_options_panel">
-"馬祖","馬祖label","red","orange"
-"台東","臺東label","#eff"
-</textarea><br />
-		本工具亦有命令列版本，請參照 <a href="https://github.com/kanasimi/taiwan_svg_map" target="_blank">kanasimi/taiwan_svg_map</a>。<br />
-		本工具地圖底本衍生自 <a href="https://commons.wikimedia.org/wiki/File:Taiwan_map_labeled.svg" target="_blank">File:Taiwan map labeled.svg</a>，您可以加以改進後提交議題以更新。<br />
-	</div>
-
-	<img id="preview_image" />
-
+    <script>
+        // 台灣22縣市標準順序（與kanasimi對應）
+        const counties = [
+            'KEELUNG', 'TAIPEI', 'NEW_TAIPEI', 'TAOYUAN', 'HSINCHU_CITY', 'HSINCHU_COUNTY',
+            'MIAOLI', 'TAICHUNG', 'CHANGHUA', 'NANTou', 'YUNLIN', 'CHIAYI_CITY',
+            'CHIAYI_COUNTY', 'Tainan', 'KAOHSIUNG', 'PINGTUNG', 'YILAN', 'HUALIEN',
+            'TAITUNG', 'KINMEN', 'PENGHU', 'LIANCHIANG'
+        ];
+        
+        const colors = ['#999', '#4CAF50', '#FFEB3B', '#FF9800', '#F44336'];
+        const input = document.getElementById('input');
+        
+        // 處理輸入
+        function updateMap() {
+            let seq = input.value.replace(/[^0-4]/g, '0').padEnd(22, '0').slice(0, 22);
+            input.value = seq;
+            
+            counties.forEach((countyId, i) => {
+                const county = document.getElementById(countyId);
+                if (county) {
+                    const visits = parseInt(seq[i]) || 0;
+                    county.style.fill = colors[visits];
+                    county.style.stroke = '#333';
+                    county.style.strokeWidth = 1;
+                    county.title = `${getCountyName(i)}: ${visits}次`;
+                }
+            });
+        }
+        
+        // 縣市中文名稱
+        function getCountyName(index) {
+            const names = [
+                '基隆市', '臺北市', '新北市', '桃園市', '新竹市', '新竹縣',
+                '苗栗縣', '臺中市', '彰化縣', '南投縣', '雲林縣', '嘉義市',
+                '嘉義縣', '臺南市', '高雄市', '屏東縣', '宜蘭縣', '花蓮縣',
+                '臺東縣', '金門縣', '澎湖縣', '連江縣'
+            ];
+            return names[index];
+        }
+        
+        // 事件監聽
+        input.addEventListener('input', updateMap);
+        
+        // hover效果
+        document.getElementById('map').addEventListener('mousemove', (e) => {
+            const target = e.target.closest('.county');
+            if (target) {
+                target.style.strokeWidth = 3;
+                target.style.stroke = '#000';
+            }
+        });
+        document.getElementById('map').addEventListener('mouseleave', (e) => {
+            const target = e.target.closest('.county');
+            if (target) {
+                target.style.strokeWidth = 1;
+                target.style.stroke = '#333';
+            }
+        });
+        
+        // 初始化
+        updateMap();
+    </script>
 </body>
-
 </html>
