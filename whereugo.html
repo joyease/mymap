@@ -58,7 +58,7 @@
         async function initMap() {
             document.getElementById('loading').style.display = 'block';
             try {
-                const response = await fetch('taiwan_counties.json');
+                const response = await fetch('./taiwan_counties.json');
                 countiesData = await response.json().counties;
                 
                 // 動態建立地圖path
