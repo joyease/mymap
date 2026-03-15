@@ -95,7 +95,7 @@
             document.getElementById('status').innerHTML = '🔄 載入用戶資料...';
             
             try {
-                const response = await fetch('data.json');
+                const response = await fetch('./data.json');
                 const data = await response.json();
                 const foundSequence = data.users[nickname];
                 
