@@ -1,167 +1,140 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>台灣22縣市互動地圖</title>
+    <meta charset="utf-8">
+    <title>我去過台灣哪裡？22縣市旅遊地圖</title>
     <style>
-        body { 
-            font-family: 'Microsoft JhengHei', sans-serif; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px; margin: 0;
-        }
-        .container { max-width: 1400px; margin: 0 auto; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
-        .header { background: linear-gradient(90deg, #ff6b6b, #feca57); color: white; text-align: center; padding: 30px; }
-        .main-content { display: grid; grid-template-columns: 1fr 350px; gap: 30px; padding: 30px; }
-        #taiwan-map { width: 100%; height: 700px; cursor: pointer; background: #f8f9fa; }
-        .sidebar { background: white; padding: 25px; border-radius: 15px; }
-        .county-item { padding: 12px; margin: 5px 0; background: #f8f9fa; cursor: pointer; border-radius: 10px; }
-        .county-item.visited { background: linear-gradient(90deg, #4facfe, #00f2fe); color: white; }
-        .tooltip { position: fixed; background: rgba(0,0,0,0.9); color: white; padding: 10px; border-radius: 8px; pointer-events: none; z-index: 1000; opacity: 0; }
+        body { font-family: 'Microsoft JhengHei', sans-serif; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin: 0; padding: 20px; }
+        .container { max-width: 1100px; margin: 0 auto; background: white; border-radius: 20px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        h1 { color: #333; margin-bottom: 10px; }
+        #nickname { font-size: 28px; font-weight: bold; padding: 15px; width: 400px; border: 3px solid #ddd; border-radius: 10px; text-align: center; margin: 20px; letter-spacing: 3px; background: #f9f9f9; }
+        #nickname:focus { border-color: #4CAF50; outline: none; box-shadow: 0 0 15px rgba(76,175,80,0.3); }
+        button { font-size: 20px; padding: 15px 30px; margin: 0 10px; border: none; border-radius: 10px; cursor: pointer; background: #4CAF50; color: white; font-weight: bold; }
+        button:hover { background: #45a049; }
+        #status { margin: 20px 0; font-size: 18px; font-weight: bold; min-height: 30px; }
+        #map { width: 100%; height: 700px; border: 3px solid #ddd; border-radius: 15px; background: #f8f9fa; margin: 20px 0; }
+        .legend { display: flex; justify-content: center; gap: 30px; margin: 30px 0; flex-wrap: wrap; font-size: 18px; font-weight: bold; }
+        .legend-item { display: flex; align-items: center; gap: 12px; background: white; padding: 15px 25px; border-radius: 30px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        .legend-color { width: 40px; height: 30px; border-radius: 8px; border: 3px solid #333; }
+        #loading { display: none; color: #666; font-size: 16px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>點亮台灣22縣市</h1>
-            <div style="display:flex; justify-content:center; gap:30px; margin-top:20px;">
-                <div><strong id="visited-count">0</strong>/22 已走訪</div>
-                <div><strong id="percent">0%</strong> 完成率</div>
-            </div>
-        </div>
+        <h1>🇹🇼 我去過台灣哪裡？</h1>
+        <p style="color:#666; font-size:20px;">輸入暱稱查看22縣市旅遊足跡</p>
+        <input type="text" id="nickname" placeholder="輸入暱稱（如：小名）">
+        <br><button onclick="loadUserData()">🔍 查詢我的地圖</button>
+        <div id="status">輸入暱稱查看旅遊記錄</div>
+        <div id="loading">🔄 載入台灣地圖中...</div>
         
-        <div class="main-content">
-            <div style="background:white; border-radius:15px; padding:20px;">
-                <svg id="taiwan-map" viewBox="0 0 1440 2055" xmlns="http://www.w3.org/2000/svg">
-                    <g id="county-group" fill="#ddd" stroke="#333" stroke-width="1"></g>
-                </svg>
-            </div>
-            
-            <div class="sidebar">
-                <h3>🏞️ 我的足跡</h3>
-                <div id="county-list"></div>
-                <button onclick="resetAll()" style="width:100%; padding:12px; background:#ff6b6b; color:white; border:none; border-radius:25px; font-weight:bold; cursor:pointer; margin-top:20px;">🔄 重置</button>
-            </div>
+        <!-- 使用JSON動態載入的台灣地圖 -->
+        <svg id="map" viewBox="0 0 1440 2055" preserveAspectRatio="xMidYMid meet" style="width:100%;height:700px;">
+            <defs>
+                <style>
+                    .county { stroke: #555; stroke-width: 1.5; fill: #999; transition: all 0.4s; cursor: pointer; }
+                    .county:hover { stroke-width: 3; stroke: #000; opacity: 0.95; }
+                </style>
+            </defs>
+            <!-- JSON會動態插入這裡 -->
+            <g id="county-group"></g>
+        </svg>
+        
+        <div class="legend">
+            <div class="legend-item"><div class="legend-color" style="background:#999;"></div>0 (未去過)</div>
+            <div class="legend-item"><div class="legend-color" style="background:#4CAF50;"></div>1次 (綠)</div>
+            <div class="legend-item"><div class="legend-color" style="background:#FFEB3B;"></div>2次 (黃)</div>
+            <div class="legend-item"><div class="legend-color" style="background:#FF9800;"></div>3次 (橘)</div>
+            <div class="legend-item"><div class="legend-color" style="background:#F44336;"></div>≥4次 (紅)</div>
         </div>
     </div>
 
-    <div class="tooltip" id="tooltip"></div>
-
     <script>
+        const colors = ['#999','#4CAF50','#FFEB3B','#FF9800','#F44336'];
         let countiesData = [];
-        let visitedCounties = new Set();
+        let countyElements = {};
         
-        // 🔥 載入JSON並渲染地圖
-        async function loadMap() {
+        // 🔥 啟動時載入台灣地圖JSON
+        async function initMap() {
+            document.getElementById('loading').style.display = 'block';
             try {
                 const response = await fetch('taiwan_counties.json');
                 countiesData = await response.json().counties;
                 
-                renderMap();
-                renderCountyList();
-                bindMapEvents();
-                
-                document.getElementById('visited-count').textContent = '0';
-                console.log(`✅ 載入 ${countiesData.length} 個縣市`);
-            } catch(e) {
-                alert('請確認 taiwan_counties.json 在同資料夾');
-            }
-        }
-        
-        // 渲染地圖path
-        function renderMap() {
-            const group = document.getElementById('county-group');
-            countiesData.forEach((county, index) => {
-                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                path.id = county.id;
-                path.title = county.title;
-                path.setAttribute('d', county.path);
-                path.setAttribute('fill', '#ddd');
-                path.dataset.index = index;
-                group.appendChild(path);
-            });
-        }
-        
-        // 渲染縣市清單
-        function renderCountyList() {
-            const list = document.getElementById('county-list');
-            countiesData.forEach((county, index) => {
-                const div = document.createElement('div');
-                div.className = 'county-item';
-                div.dataset.index = index;
-                div.innerHTML = `<input type="checkbox" style="margin-right:10px; transform:scale(1.2);"> ${county.title}`;
-                div.addEventListener('click', (e) => {
-                    if(e.target.tagName !== 'INPUT') {
-                        const cb = div.querySelector('input');
-                        cb.checked = !cb.checked;
-                        toggleCounty(index, cb.checked);
-                    }
+                // 動態建立地圖path
+                const group = document.getElementById('county-group');
+                countiesData.forEach((county, index) => {
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    path.id = county.id;
+                    path.className.baseVal = 'county';
+                    path.setAttribute('title', county.title);
+                    path.setAttribute('d', county.path);
+                    path.dataset.index = index;
+                    countyElements[county.id] = path;
+                    group.appendChild(path);
                 });
-                list.appendChild(div);
-            });
-        }
-        
-        // 綁定地圖事件
-        function bindMapEvents() {
-            const svg = document.getElementById('taiwan-map');
-            const tooltip = document.getElementById('tooltip');
-            
-            svg.addEventListener('mousemove', (e) => {
-                const path = e.target.closest('path');
-                if(path && path.title) {
-                    tooltip.textContent = path.title;
-                    tooltip.style.opacity = '1';
-                    tooltip.style.left = (e.pageX + 10) + 'px';
-                    tooltip.style.top = (e.pageY - 10) + 'px';
-                }
-            });
-            
-            svg.addEventListener('mouseleave', () => {
-                tooltip.style.opacity = '0';
-            });
-            
-            svg.addEventListener('click', (e) => {
-                const path = e.target.closest('path');
-                if(path) {
-                    const index = parseInt(path.dataset.index);
-                    const isVisited = visitedCounties.has(index);
-                    toggleCounty(index, !isVisited);
-                }
-            });
-        }
-        
-        // 切換縣市狀態
-        function toggleCounty(index, visited) {
-            if(visited) {
-                visitedCounties.add(index);
-                document.querySelector(`path[data-index="${index}"]`).setAttribute('fill', '#4facfe');
-                document.querySelectorAll(`[data-index="${index}"]`)[1].classList.add('visited');
-            } else {
-                visitedCounties.delete(index);
-                document.querySelector(`path[data-index="${index}"]`).setAttribute('fill', '#ddd');
-                document.querySelectorAll(`[data-index="${index}"]`)[1].classList.remove('visited');
+                
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('status').innerHTML = `✅ 地圖載入完成！發現 ${countiesData.length} 個縣市`;
+                
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('status').innerHTML = '❌ 無法載入 taiwan_counties.json，請確認檔案存在';
+                console.error('JSON載入錯誤:', error);
             }
-            updateStats();
         }
         
-        // 更新統計
-        function updateStats() {
-            const count = visitedCounties.size;
-            const percent = Math.round((count / countiesData.length) * 100);
-            document.getElementById('visited-count').textContent = count;
-            document.getElementById('percent').textContent = percent + '%';
+        // 🔍 查詢用戶資料
+        async function loadUserData() {
+            const nickname = document.getElementById('nickname').value.trim();
+            if (!nickname) {
+                document.getElementById('status').innerHTML = '⚠️ 請輸入暱稱';
+                return;
+            }
+            
+            document.getElementById('status').innerHTML = '🔄 載入用戶資料...';
+            
+            try {
+                const response = await fetch('data.json');
+                const data = await response.json();
+                const foundSequence = data.users[nickname];
+                
+                if (foundSequence && foundSequence.length === countiesData.length) {
+                    const visitedCount = foundSequence.split('').filter(n => n !== '0').length;
+                    document.getElementById('status').innerHTML = `✅ ${nickname} 去過 ${visitedCount}/${countiesData.length} 個縣市`;
+                    updateMap(foundSequence);
+                } else {
+                    document.getElementById('status').innerHTML = `❌ 未找到 "${nickname}" 的資料<br>請確認 data.json 有此暱稱`;
+                }
+            } catch (error) {
+                document.getElementById('status').innerHTML = '❌ 載入失敗，請確認 data.json 存在';
+                console.error('錯誤:', error);
+            }
         }
         
-        // 重置
-        function resetAll() {
-            visitedCounties.clear();
-            countiesData.forEach((_, index) => toggleCounty(index, false));
-            updateStats();
+        // 更新地圖顏色
+        function updateMap(seq) {
+            countiesData.forEach((county, i) => {
+                const path = countyElements[county.id];
+                if (path) {
+                    const visits = parseInt(seq[i]) || 0;
+                    path.style.fill = colors[visits] || '#999';
+                    path.title = `${county.title}: ${visits}次`;
+                }
+            });
         }
         
-        // 啟動
-        loadMap();
+        // Enter鍵觸發查詢
+        document.getElementById('nickname').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') loadUserData();
+        });
+        
+        // 頁面載入完成
+        window.onload = () => {
+            initMap();
+        };
     </script>
 </body>
 </html>
+
 
