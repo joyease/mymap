@@ -38,7 +38,7 @@
         const visited = ['TWN', 'JPN', 'USA', 'CAN', 'KOR'];  // 加韓國示例，改你的
 
         // 載入地圖（unpkg CDN，GitHub Pages安全）
-        d3.json("https://unpkg.com/world-atlas@2.0.2/countries-110m.json").then(world => {
+        d3.json("whereugo.json").then(world => {
             const land = topojson.feature(world, world.objects.countries);
 
             svg.append("path")
