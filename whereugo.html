@@ -1,33 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Visited Countries Globe - GitHub Fix</title>
+    <title>大尺寸去過國家地球儀</title>
     <script src="https://unpkg.com/d3@7/dist/d3.min.js"></script>
     <script src="https://unpkg.com/topojson@3/dist/topojson.min.js"></script>
     <style>
-        body { background: black; text-align: center; margin: 20px; font-family: Arial; }
-        #worldmap svg { background: rgba(50,167,224,0.4); border-radius: 200px; box-shadow: 0 0 20px rgba(0,0,0,0.5); cursor: grab; }
+        body { background: linear-gradient(to bottom, #000428, #004e92); text-align: center; margin: 20px; font-family: Arial, sans-serif; color: white; }
+        #worldmap { margin: 20px auto; }
+        #worldmap svg { background: rgba(50,167,224,0.3); border-radius: 50%; box-shadow: 0 0 50px rgba(255,255,255,0.3); cursor: grab; transition: transform 0.3s; }
+        #worldmap svg:hover { transform: scale(1.02); }
         #worldmap svg:active { cursor: grabbing; }
-        .ocean { fill: #0a0c10; }
-        .land { fill: rgba(188,188,188,0.8); stroke: #fff; stroke-width: 0.3px; transition: fill 0.3s; }
-        .visited { fill: gold; stroke: #ffed4e; stroke-width: 1px; }
-        .land:hover { fill: orange; }
-        #info { color: white; }
-        #error { color: red; }
+        .ocean { fill: #001122; }
+        .land { fill: rgba(200,200,200,0.7); stroke: rgba(255,255,255,0.5); stroke-width: 0.5px; transition: all 0.3s; }
+        .visited { fill: #FFD700 !important; stroke: #FFA500 !important; stroke-width: 2px; filter: drop-shadow(0 0 5px #FFD700); }
+        .land:hover { fill: #FF8C00 !important; stroke-width: 2px; }
+        #info { font-size: 18px; margin: 20px; }
+        #error { color: #FF6B6B; font-size: 16px; }
+        @media (max-width: 768px) { #worldmap svg { width: 400px; height: 400px; } }
     </style>
 </head>
 <body>
-    <h2>我的去過國家地球儀</h2>
+    <h1>🌍 我的去過國家地球儀</h1>
     <div id="worldmap"></div>
-    <p id="info">拖曳旋轉 | 黃色=去過國家 | 滑鼠hover看細節</p>
+    <p id="info">拖曳旋轉地球 | 黃金色=去過國家 | Hover查看國家資訊</p>
     <p id="error" style="display:none;"></p>
 
     <script>
-        const width = 500, height = 500;
+        let width = Math.min(window.innerWidth * 0.8, 900);
+        let height = width;
         const projection = d3.geoOrthographic()
-            .scale(220)
+            .scale(width * 0.25)
             .translate([width / 2, height / 2])
-            .rotate([0, 0])  // 初始視角
             .clipAngle(90);
 
         const path = d3.geoPath().projection(projection);
@@ -35,47 +38,57 @@
             .attr("width", width).attr("height", height)
             .call(d3.drag().on("drag", dragRotate));
 
-        const visited = ['TW', 'JPN', 'US', 'CAN', 'KOR'];  // 加韓國示例，改你的
+        // 用國家名匹配（避ISO undefined）
+        const visitedNames = ['Taiwan', 'Japan', 'United States of America', 'Canada', 'Korea'];  // 改你的，console會顯示確切名
 
-        // 載入地圖（unpkg CDN，GitHub Pages安全）
-        d3.json("whereugo.json").then(world => {
+        d3.json("https://unpkg.com/world-atlas@2.0.2/countries-110m.json").then(world => {
             const land = topojson.feature(world, world.objects.countries);
 
-            svg.append("path")
-                .datum({type: "Sphere"})
-                .attr("class", "ocean")
+            svg.append("path").datum({type: "Sphere"}).attr("class", "ocean").attr("d", path);
+
+            const lands = svg.selectAll(".land").data(land.features).enter().append("path")
+                .attr("class", "land")
                 .attr("d", path);
 
-            svg.selectAll(".land")
-                .data(land.features)
-                .enter().append("path")
-                .attr("class", "land")
-                .attr("d", path)
-                .style("fill", d => visited.includes(d.properties.iso_a3) ? "gold" : "rgba(188,188,188,0.8)")
-                .style("stroke", "#fff")
-                .style("stroke-width", d => visited.includes(d.properties.iso_a3) ? "1px" : "0.3px")
-                .on("mouseover", (event, d) => {
-                    d3.select("#info").text(`國家: ${d.properties.name} (ISO: ${d.properties.iso_a3})`);
-                })
-                .on("mouseout", () => d3.select("#info").text("拖曳旋轉 | 黃色=去過國家"));
+            let visitedCount = 0;
+            lands.each(function(d) {
+                const props = d.properties;
+                const name = props.name || '';
+                if (visitedNames.some(v => name.includes(v))) {
+                    d3.select(this).classed("visited", true);
+                    visitedCount++;
+                }
+            });
 
-            // 自動旋轉（選用）
-            // d3.timer(() => { projection.rotate([Date.now() * 0.005 % 360, 0]); svg.selectAll("path").attr("d", path); });
+            console.log(`標記 ${visitedCount} 國 (names: ${visitedNames.join(', ')})`);
+
+            lands.on("mouseover", function(event, d) {
+                const props = d.properties;
+                const countryName = props.name || 'Unknown';
+                const iso = props.iso_a3 || 'N/A';
+                d3.select("#info").text(`${countryName} (ISO: ${iso})`);
+                console.log('詳細:', props);
+            }).on("mouseout", () => {
+                d3.select("#info").text(`已標記 ${visitedCount} 國 | 拖曳旋轉 | Hover查看`);
+            });
+
+            d3.select("#info").text(`已標記 ${visitedCount} 國！拖曳旋轉探索`);
         }).catch(err => {
-            document.getElementById("error").textContent = "載入失敗: " + err + " (檢查網路或CDN)";
-            document.getElementById("error").style.display = "block";
+            d3.select("#error").text("載入失敗，請檢查網路: " + err).style("display", "block");
         });
 
         function dragRotate(event) {
             const rotate = projection.rotate();
-            const dx = event.dx / 2;
-            const dy = -event.dy / 2;
-            projection.rotate([rotate[0] + dx, Math.max(-90, Math.min(90, rotate[1] + dy))]);
+            projection.rotate([rotate[0] + event.dx * 0.5, Math.max(-90, Math.min(90, rotate[1] - event.dy * 0.5))]);
             svg.selectAll("path").attr("d", path);
         }
+
+        // 響應式
+        window.onresize = () => location.reload();
     </script>
 </body>
 </html>
+
 
 
 
