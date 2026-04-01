@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>科技 x 人文：文明進化觀</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;900&family=Noto+Sans+TC:wght@300;400;500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+–ink: #1a1a2e;
+–paper: #f5f0e8;
+–accent: #c0392b;
+–gold: #b8860b;
+–muted: #6b6560;
+–card-bg: #fefcf7;
+–border: rgba(26,26,46,0.12);
+}
+
+body {
+font-family: ‘Noto Sans TC’, sans-serif;
+background: var(–paper);
+color: var(–ink);
+min-height: 100vh;
+}
+
+/* ── HERO ── */
+.hero {
+position: relative;
+padding: 64px 24px 48px;
+text-align: center;
+overflow: hidden;
+background:
+radial-gradient(ellipse 80% 50% at 50% 0%, rgba(192,57,43,0.07) 0%, transparent 70%),
+var(–paper);
+border-bottom: 1px solid var(–border);
+}
+
+.hero::before {
+content: ‘文’;
+position: absolute;
+font-family: ‘Noto Serif TC’, serif;
+font-size: 320px;
+font-weight: 900;
+color: rgba(26,26,46,0.04);
+top: -60px; left: 50%;
+transform: translateX(-50%);
+pointer-events: none;
+user-select: none;
+letter-spacing: -20px;
+}
+
+.hero-en {
+font-family: ‘DM Serif Display’, serif;
+font-style: italic;
+font-size: clamp(11px, 1.8vw, 13px);
+letter-spacing: 0.3em;
+text-transform: uppercase;
+color: var(–accent);
+margin-bottom: 16px;
+display: block;
+}
+
+.hero-title {
+font-family: ‘Noto Serif TC’, serif;
+font-size: clamp(28px, 6vw, 52px);
+font-weight: 900;
+line-height: 1.15;
+color: var(–ink);
+margin-bottom: 12px;
+position: relative;
+z-index: 1;
+}
+
+.hero-title .x {
+color: var(–accent);
+font-style: normal;
+}
+
+.hero-sub {
+font-size: clamp(13px, 2vw, 15px);
+color: var(–muted);
+font-weight: 300;
+letter-spacing: 0.08em;
+margin-bottom: 32px;
+position: relative;
+z-index: 1;
+}
+
+.hero-cta {
+display: inline-block;
+padding: 12px 32px;
+background: var(–ink);
+color: var(–paper);
+font-size: 13px;
+letter-spacing: 0.15em;
+text-decoration: none;
+font-weight: 500;
+transition: background 0.2s, transform 0.2s;
+position: relative;
+z-index: 1;
+}
+.hero-cta:hover { background: var(–accent); transform: translateY(-1px); }
+
+/* ── SECTION LABEL ── */
+.section-label {
+text-align: center;
+padding: 40px 24px 8px;
+}
+.section-label h2 {
+font-family: ‘Noto Serif TC’, serif;
+font-size: clamp(15px, 2.5vw, 18px);
+font-weight: 600;
+color: var(–muted);
+letter-spacing: 0.25em;
+position: relative;
+display: inline-block;
+}
+.section-label h2::before,
+.section-label h2::after {
+content: ‘—’;
+color: var(–gold);
+margin: 0 12px;
+font-style: normal;
+}
+
+/* ── GRID ── */
+.grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+gap: 1px;
+background: var(–border);
+max-width: 1100px;
+margin: 24px auto 0;
+border: 1px solid var(–border);
+}
+
+/* ── CARD ── */
+.card {
+background: var(–card-bg);
+padding: 32px 28px 28px;
+display: flex;
+flex-direction: column;
+gap: 12px;
+position: relative;
+overflow: hidden;
+cursor: pointer;
+transition: background 0.25s;
+text-decoration: none;
+color: inherit;
+}
+
+.card::after {
+content: ‘’;
+position: absolute;
+top: 0; left: 0;
+width: 3px; height: 0;
+background: var(–card-accent, var(–accent));
+transition: height 0.3s ease;
+}
+.card:hover { background: #fffff9; }
+.card:hover::after { height: 100%; }
+
+.card-icon {
+font-size: 32px;
+line-height: 1;
+margin-bottom: 4px;
+}
+
+.card-audience {
+font-family: ‘DM Serif Display’, serif;
+font-style: italic;
+font-size: 11px;
+letter-spacing: 0.25em;
+text-transform: uppercase;
+color: var(–card-accent, var(–accent));
+}
+
+.card-title {
+font-family: ‘Noto Serif TC’, serif;
+font-size: clamp(18px, 3vw, 22px);
+font-weight: 900;
+line-height: 1.3;
+color: var(–ink);
+}
+
+.card-desc {
+font-size: 13px;
+line-height: 1.85;
+color: var(–muted);
+font-weight: 300;
+flex: 1;
+}
+
+.card-tags {
+display: flex;
+flex-wrap: wrap;
+gap: 6px;
+margin-top: 4px;
+}
+
+.tag {
+font-size: 11px;
+letter-spacing: 0.05em;
+padding: 3px 10px;
+border: 1px solid var(–border);
+color: var(–muted);
+background: transparent;
+font-weight: 400;
+}
+
+.card-arrow {
+font-size: 18px;
+color: var(–card-accent, var(–accent));
+align-self: flex-end;
+margin-top: auto;
+transition: transform 0.2s;
+}
+.card:hover .card-arrow { transform: translateX(4px); }
+
+/* colour variants */
+.c-red  { –card-accent: #c0392b; }
+.c-blue { –card-accent: #1a5276; }
+.c-teal { –card-accent: #0e6655; }
+.c-gold { –card-accent: #b8860b; }
+.c-purple { –card-accent: #6c3483; }
+.c-navy { –card-accent: #1a237e; }
+
+/* ── FEATURED ROW ── */
+.featured-row {
+max-width: 1100px;
+margin: 1px auto 0;
+background: var(–border);
+border: 1px solid var(–border);
+border-top: none;
+}
+.featured-inner {
+background: var(–ink);
+padding: 32px 36px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 24px;
+flex-wrap: wrap;
+}
+.featured-inner .left {
+flex: 1 1 300px;
+}
+.featured-inner .eyebrow {
+font-family: ‘DM Serif Display’, serif;
+font-style: italic;
+font-size: 11px;
+letter-spacing: 0.3em;
+text-transform: uppercase;
+color: var(–gold);
+margin-bottom: 8px;
+display: block;
+}
+.featured-inner h3 {
+font-family: ‘Noto Serif TC’, serif;
+font-size: clamp(20px, 4vw, 26px);
+font-weight: 900;
+color: var(–paper);
+line-height: 1.3;
+}
+.featured-inner p {
+margin-top: 10px;
+font-size: 13px;
+color: rgba(245,240,232,0.6);
+font-weight: 300;
+line-height: 1.8;
+}
+.featured-link {
+display: inline-block;
+padding: 12px 30px;
+border: 1px solid var(–gold);
+color: var(–gold);
+font-size: 12px;
+letter-spacing: 0.2em;
+text-transform: uppercase;
+text-decoration: none;
+transition: background 0.2s, color 0.2s;
+white-space: nowrap;
+flex-shrink: 0;
+}
+.featured-link:hover { background: var(–gold); color: var(–ink); }
+
+/* ── FOOTER ── */
+.footer {
+max-width: 1100px;
+margin: 40px auto 0;
+padding: 0 24px 48px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+flex-wrap: wrap;
+gap: 12px;
+border-top: 1px solid var(–border);
+padding-top: 24px;
+}
+.footer-brand {
+font-family: ‘Noto Serif TC’, serif;
+font-size: 13px;
+font-weight: 600;
+color: var(–ink);
+letter-spacing: 0.1em;
+}
+.footer-brand span {
+font-family: ‘DM Serif Display’, serif;
+font-style: italic;
+font-size: 11px;
+font-weight: 400;
+color: var(–muted);
+letter-spacing: 0.15em;
+margin-left: 8px;
+}
+.footer-copy {
+font-size: 11px;
+color: var(–muted);
+letter-spacing: 0.05em;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+from { opacity: 0; transform: translateY(20px); }
+to   { opacity: 1; transform: translateY(0); }
+}
+.hero > * { animation: fadeUp 0.7s ease both; }
+.hero-en       { animation-delay: 0.05s; }
+.hero-title    { animation-delay: 0.15s; }
+.hero-sub      { animation-delay: 0.25s; }
+.hero-cta      { animation-delay: 0.35s; }
+
+.card {
+animation: fadeUp 0.6s ease both;
+}
+.card:nth-child(1) { animation-delay: 0.1s; }
+.card:nth-child(2) { animation-delay: 0.2s; }
+.card:nth-child(3) { animation-delay: 0.3s; }
+.card:nth-child(4) { animation-delay: 0.4s; }
+.card:nth-child(5) { animation-delay: 0.5s; }
+.card:nth-child(6) { animation-delay: 0.6s; }
+
+@media (max-width: 600px) {
+.grid { grid-template-columns: 1fr; }
+.featured-inner { padding: 24px 20px; }
+}
+</style>
+
+</head>
+<body>
+
+<!-- HERO -->
+
+<div class="hero">
+  <span class="hero-en">Technology × Humanity · Civilizational Evolution</span>
+  <h1 class="hero-title">科技 <span class="x">×</span> 人文<br>文明進化觀</h1>
+  <p class="hero-sub">從科技脈動到人文思維，探索文明演進的軌跡</p>
+  <a href="https://www.hermann.tw" class="hero-cta" target="_blank">進入部落格 →</a>
+</div>
+
+<!-- WHO ARE YOU -->
+
+<div class="section-label">
+  <h2>選擇你的閱讀入口</h2>
+</div>
+
+<!-- CARDS GRID -->
+
+<div class="grid">
+
+  <!-- 1 企業主 / 主管 -->
+
+  <a href="https://www.hermann.tw/search/label/AI%20%E5%89%B5%E6%96%B0%E6%87%89%E7%94%A8" class="card c-red" target="_blank">
+    <div class="card-icon">🏢</div>
+    <div class="card-audience">企業主 · 高階主管</div>
+    <div class="card-title">AI 轉型<br>決策者</div>
+    <div class="card-desc">
+      AI 如何改變你的組織、流程與商業模式？從詹文男的產業觀察到具體的 Agent 應用，這裡是企業主管的 AI 導航地圖。
+    </div>
+    <div class="card-tags">
+      <span class="tag">AI 轉型</span>
+      <span class="tag">企業策略</span>
+      <span class="tag">組織變革</span>
+    </div>
+    <div class="card-arrow">→</div>
+  </a>
+
+  <!-- 2 財金投資人 -->
+
+  <a href="https://www.hermann.tw/search/label/AI%20%E8%88%87%E8%B2%A1%E5%8B%99%E9%87%91%E8%9E%8D" class="card c-blue" target="_blank">
+    <div class="card-icon">📈</div>
+    <div class="card-audience">投資人 · 財金愛好者</div>
+    <div class="card-title">財金與<br>貨幣秩序</div>
+    <div class="card-desc">
+      美元霸權會走向終點嗎？預測市場是賭博還是工具？從羅格夫到 Polymarket，解讀全球貨幣與金融的深層邏輯。
+    </div>
+    <div class="card-tags">
+      <span class="tag">美元霸權</span>
+      <span class="tag">加密貨幣</span>
+      <span class="tag">預測市場</span>
+    </div>
+    <div class="card-arrow">→</div>
+  </a>
+
+  <!-- 3 科技愛好者 -->
+
+  <a href="https://www.hermann.tw/search/label/Robotics%20%E6%A9%9F%E5%99%A8%E4%BA%BA" class="card c-teal" target="_blank">
+    <div class="card-icon">🤖</div>
+    <div class="card-audience">科技愛好者 · 工程師</div>
+    <div class="card-title">機器人與<br>科技前沿</div>
+    <div class="card-desc">
+      從分身機器人到 AI 代理人，探索機器與人類之間邊界的消融。105 篇 Robotics 深度觀察，帶你站在技術的最前沿。
+    </div>
+    <div class="card-tags">
+      <span class="tag">機器人</span>
+      <span class="tag">AI Agent</span>
+      <span class="tag">奇點</span>
+    </div>
+    <div class="card-arrow">→</div>
+  </a>
+
+  <!-- 4 人文思考者 -->
+
+  <a href="https://www.hermann.tw/search/label/Harari%20%E6%AD%B7%E5%8F%B2%E8%88%87%E9%80%A3%E7%B5%90" class="card c-gold" target="_blank">
+    <div class="card-icon">🌍</div>
+    <div class="card-audience">思考者 · 人文讀者</div>
+    <div class="card-title">歷史、人性<br>與文明</div>
+    <div class="card-desc">
+      Harari、Kahneman、Naval、諸子百家⋯⋯這裡是跨越時代的智慧對話。理解人類的過去，才能看懂我們的未來。
+    </div>
+    <div class="card-tags">
+      <span class="tag">歷史思維</span>
+      <span class="tag">行為科學</span>
+      <span class="tag">哲學</span>
+    </div>
+    <div class="card-arrow">→</div>
+  </a>
+
+  <!-- 5 創新者 / 創業者 -->
+
+  <a href="https://www.hermann.tw/search/label/%E8%BD%89%E5%9E%8B%E8%88%87%E5%89%B5%E6%96%B0" class="card c-purple" target="_blank">
+    <div class="card-icon">💡</div>
+    <div class="card-audience">創業者 · 創新人才</div>
+    <div class="card-title">轉型與<br>創新思維</div>
+    <div class="card-desc">
+      Grant 的逆思維、Improv 即興創作的商業啟示、Demo 展示的力量⋯⋯打破既有框架，找到創新的下一步。
+    </div>
+    <div class="card-tags">
+      <span class="tag">逆向思考</span>
+      <span class="tag">創業精神</span>
+      <span class="tag">破框</span>
+    </div>
+    <div class="card-arrow">→</div>
+  </a>
+
+  <!-- 6 溝通 / 管理者 -->
+
+  <a href="https://www.hermann.tw/search/label/%E4%BA%BA%E6%80%A7%E8%88%87%E6%BA%9D%E9%80%9A" class="card c-navy" target="_blank">
+    <div class="card-icon">🧠</div>
+    <div class="card-audience">管理者 · 溝通學習者</div>
+    <div class="card-title">人性、溝通<br>與領導力</div>
+    <div class="card-desc">
+      人為什麼這樣思考？組織怎麼有效溝通？從心理學到實戰案例，探索讓自己與他人都更好的思維方式。
+    </div>
+    <div class="card-tags">
+      <span class="tag">溝通技巧</span>
+      <span class="tag">心理學</span>
+      <span class="tag">領導</span>
+    </div>
+    <div class="card-arrow">→</div>
+  </a>
+
+</div>
+
+<!-- FEATURED: 最新系列 -->
+
+<div class="featured-row">
+  <div class="featured-inner">
+    <div class="left">
+      <span class="eyebrow">Latest Series · 最新系列</span>
+      <h3>《我們的美元，你們的問題》<br>全系列導讀</h3>
+      <p>諾貝爾經濟學家 Kenneth Rogoff 的重磅新書，從美元霸權、日本經驗、加密貨幣到全球金融未來，逐章深度解析。</p>
+    </div>
+    <a href="https://www.hermann.tw/search/label/AI%20%E8%88%87%E8%B2%A1%E5%8B%99%E9%87%91%E8%9E%8D" class="featured-link" target="_blank">閱讀系列 →</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+
+<div class="footer">
+  <div class="footer-brand">
+    文華 Hermann
+    <span>科技 × 人文 · 文明進化觀</span>
+  </div>
+  <div class="footer-copy">© 2026 · hermann.tw · All rights reserved</div>
+</div>
+
+</body>
+</html>
