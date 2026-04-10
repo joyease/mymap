@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>赫學堂｜思想與科技的交會點</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;900&family=Noto+Sans+TC:wght@300;400;500&family=DM+Serif+Display&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+ --ink:#1c1c2e;
+ --paper:#f6f1e8;
+ --muted:#7a746d;
+
+ --c1:#e76f51;
+ --c2:#457b9d;
+ --c3:#2a9d8f;
+}
+
+body{
+ font-family:'Noto Sans TC',sans-serif;
+ background:var(--paper);
+ color:var(--ink);
+}
+
+/* HERO */
+.hero{
+ text-align:center;
+ padding:100px 20px 70px;
+ background:linear-gradient(to bottom,#fdfaf4,#f6f1e8);
+}
+
+.hero-title{
+ font-family:'Noto Serif TC',serif;
+ font-size:56px;
+ font-weight:900;
+ letter-spacing:6px;
+}
+
+.hero-sub{
+ margin-top:16px;
+ color:#a65a2a;
+ font-size:14px;
+ letter-spacing:.2em;
+}
+
+.hero-desc{
+ margin-top:20px;
+ font-size:15px;
+ color:var(--muted);
+ line-height:1.8;
+}
+
+/* FEATURE */
+.feature{
+ max-width:1100px;
+ margin:40px auto;
+ display:grid;
+ grid-template-columns:repeat(3,1fr);
+ gap:20px;
+}
+
+@media(max-width:768px){
+ .feature{grid-template-columns:1fr;}
+}
+
+.feature-card{
+ padding:30px;
+ border-radius:16px;
+ background:white;
+ transition:.3s;
+ cursor:pointer;
+}
+
+.feature-card:hover{
+ transform:translateY(-8px);
+ box-shadow:0 15px 40px rgba(0,0,0,0.08);
+}
+
+.f1{border-top:5px solid var(--c1);}
+.f2{border-top:5px solid var(--c2);}
+.f3{border-top:5px solid var(--c3);}
+
+.feature-title{
+ font-family:'Noto Serif TC',serif;
+ font-size:26px;
+ font-weight:900;
+ margin-bottom:10px;
+}
+
+.feature-desc{
+ font-size:14px;
+ color:var(--muted);
+ line-height:1.8;
+}
+
+/* GRID */
+.grid{
+ max-width:1100px;
+ margin:50px auto;
+ display:grid;
+ grid-template-columns:repeat(3,1fr);
+ gap:20px;
+}
+
+@media(max-width:768px){
+ .grid{grid-template-columns:1fr;}
+}
+
+.card{
+ background:white;
+ padding:30px;
+ border-radius:16px;
+ transition:.25s;
+ text-decoration:none;
+ color:inherit;
+ display:flex;
+ flex-direction:column;
+}
+
+.card:hover{
+ transform:translateY(-6px);
+ box-shadow:0 10px 30px rgba(0,0,0,0.08);
+}
+
+.card-title{
+ font-family:'Noto Serif TC',serif;
+ font-size:22px;
+ font-weight:900;
+ margin-bottom:10px;
+}
+
+.card-desc{
+ font-size:13px;
+ color:var(--muted);
+ line-height:1.7;
+}
+
+.tag{
+ display:inline-block;
+ margin-top:10px;
+ font-size:11px;
+ padding:4px 10px;
+ border-radius:20px;
+ background:#f1ece4;
+}
+
+/* SECTION */
+.section-title{
+ text-align:center;
+ margin-top:80px;
+ font-family:'Noto Serif TC',serif;
+ font-size:28px;
+}
+
+/* PODCAST */
+.podcast{
+ text-align:center;
+ margin:50px 0;
+}
+
+.podcast a{
+ display:inline-block;
+ margin-top:10px;
+ padding:10px 20px;
+ border-radius:30px;
+ background:black;
+ color:white;
+ text-decoration:none;
+}
+
+/* FOOTER */
+.footer{
+ text-align:center;
+ margin:80px 0;
+ font-size:13px;
+ color:#6b645c;
+ line-height:1.8;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-title">赫學堂</div>
+  <div class="hero-sub">HE = GOOD × HARMONY</div>
+  <div class="hero-desc">
+    在科技爆炸與文明轉型的時代，<br>
+    建立一套「可持續進化的思考系統」
+  </div>
+</div>
+
+<!-- 三大主軸 -->
+<div class="feature">
+
+  <div class="feature-card f1">
+    <div class="feature-title">科技創新</div>
+    <div class="feature-desc">
+      AI × Web3 × 健康科技<br>
+      不是追趨勢，而是理解未來的結構
+    </div>
+  </div>
+
+  <div class="feature-card f2">
+    <div class="feature-title">人文商管</div>
+    <div class="feature-desc">
+      商業思維 × 人際溝通 × 文明觀<br>
+      理解人，才能駕馭世界
+    </div>
+  </div>
+
+  <div class="feature-card f3">
+    <div class="feature-title">進化利世</div>
+    <div class="feature-desc">
+      易經 × 東方智慧 × 競合思維<br>
+      從競爭走向共生
+    </div>
+  </div>
+
+</div>
+
+<!-- 精選內容 -->
+<div class="section-title">精選內容</div>
+
+<div class="grid">
+
+  <a href="https://www.hermann.tw/search/label/A%3A%20AI%20%E6%87%89%E7%94%A8" class="card">
+    <div class="card-title">AI 應用</div>
+    <div class="card-desc">從工具到思維，AI 如何改變個人與產業</div>
+    <div class="tag">科技</div>
+  </a>
+
+  <a href="https://www.hermann.tw/search/label/B%3A%20%E5%95%86%E6%A5%AD%E8%B2%A1%E7%B6%93" class="card">
+    <div class="card-title">商業財經</div>
+    <div class="card-desc">企業策略、投資邏輯與市場洞察</div>
+    <div class="tag">商業</div>
+  </a>
+
+  <a href="https://www.hermann.tw/search/label/H%3A%20%E6%9D%B1%E6%96%B9%E6%80%9D%E6%83%B3" class="card">
+    <div class="card-title">東方思想</div>
+    <div class="card-desc">易經、老莊與現代決策的融合</div>
+    <div class="tag">思想</div>
+  </a>
+
+</div>
+
+<!-- PODCAST -->
+<div class="podcast">
+  <div class="section-title">🎧 赫曼說 Podcast</div>
+  <a href="https://hermann.firstory.io" target="_blank">立即收聽</a>
+</div>
+
+<!-- 友站 -->
+<div class="section-title">延伸內容</div>
+
+<div class="grid">
+
+  <a href="https://www.hermann.tw" class="card">
+    <div class="card-title">赫筆札</div>
+    <div class="card-desc">深度文章與觀點整理</div>
+  </a>
+
+  <a href="https://www.manga.hermann.tw" class="card">
+    <div class="card-title">赫曼畫</div>
+    <div class="card-desc">一字一圖的思想視覺化</div>
+  </a>
+
+  <a href="#" class="card">
+    <div class="card-title">未來計畫</div>
+    <div class="card-desc">AI × 易經 × 個人品牌系統</div>
+  </a>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  這不只是一個網站，而是一個思想實驗。<br>
+  在科技與人文的交會點，尋找更好的自己。<br><br>
+  © 2026 hermann.tw
+</div>
+
+</body>
+</html>
