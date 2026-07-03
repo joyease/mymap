@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>繫辭句子速查(雙關鍵詞)</title>
+  <style>
+    body {
+      font-family: "Microsoft JhengHei", sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      background-color: #f9f9f9;
+    }
+    h2 { color: #333; border-bottom: 2px solid #8c7853; padding-bottom: 10px; }
+    .search-box { margin-bottom: 20px; }
+    input { padding: 8px; margin-right: 5px; border: 1px solid #ccc; border-radius: 4px; }
+    button { padding: 8px 15px; background-color: #8c7853; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    button:hover { background-color: #6e5d3f; }
+    ul { list-style: none; padding: 0; }
+    li { background: white; padding: 15px; margin-bottom: 10px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 4px solid #8c7853; }
+    .sentence { font-size: 1.1em; font-weight: bold; color: #222; margin-bottom: 5px; }
+    .meta { font-size: 0.9em; color: #666; }
+    .loading { color: #888; font-style: italic; }
+  </style>
+</head>
+<body>
+
+  <h2>繫辭句子速查(雙關鍵詞)</h2>
+  <p>請輸入兩個關鍵詞(如：君子, 小人)，將找出同時出現這兩個詞的句子</p>
+  
+  <div class="search-box">
+    <input type="text" id="keyword1" placeholder="輸入關鍵字1">
+    <input type="text" id="keyword2" placeholder="輸入關鍵字2">
+    <button onclick="search()">搜尋</button>
+  </div>
+
+  <ul id="results"></ul>
+
+  <script>
+  function search() {
+    var q1 = document.getElementById('keyword1').value.trim();
+    var q2 = document.getElementById('keyword2').value.trim();
+    var ul = document.getElementById('results');
+    
+    if (!q1 || !q2) {
+      alert("請輸入兩個關鍵字！");
+      return;
+    }
+    
+    // 顯示載入中狀態
+    ul.innerHTML = '<li class="loading">搜尋中，請稍候...</li>';
+    
+    var apiUrl = 'https://script.google.com/macros/s/AKfycbyjPuNHchlNP-M49YF1vm3hDkIetmBj5xwxgC_3RL59GJ90QqzhTGP-MW1uUCHMf7Om/exec?q1=' + encodeURIComponent(q1) + '&q2=' + encodeURIComponent(q2);
+
+    fetch(apiUrl)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('網路錯誤：' + response.status);
+        }
+        return response.json();
+      })
+      .then(data => {
+        ul.innerHTML = ''; // 清空載入提示
+        
+        if (!data || data.length === 0) {
+          ul.innerHTML = '<li>找不到符合的句子。</li>';
+          return;
+        }
+        
+        data.forEach(function(item) {
+          var li = document.createElement('li');
+          
+          // 建立結構
+          var divSentence = document.createElement('div');
+          divSentence.className = 'sentence';
+          divSentence.textContent = item.sentence; // 使用 textContent 防範 XSS
+          
+          var divMeta = document.createElement('div');
+          divMeta.className = 'meta';
+          divMeta.textContent = `索引：${item.index || '無'} ｜ 章節：${item.chapter || '無'}`;
+          
+          li.appendChild(divSentence);
+          li.appendChild(divMeta);
+          ul.appendChild(li);
+        });
+      })
+      .catch(error => {
+        console.error('錯誤:', error);
+        ul.innerHTML = '<li style="color: red;">搜尋失敗，請檢查網路連線或後端設定。</li>';
+      });
+  }
+  </script>
+</body>
+</html>
