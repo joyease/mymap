@@ -1,7 +1,8 @@
 function doGet(e) {
-  // 讀取搜尋模式種類 (single 或 double)
-  var type = e.parameter.type;
+  // 讀取前端傳過來的單一關鍵字 q
+  var keyword = e.parameter.q;
   
+  // 請確保這裡的試算表 ID 與工作表名稱正確
   var sheet = SpreadsheetApp.openById('1H6nEID60avDHip4c01XhhbI2jhi5ZI9Di6_KIGF2qKw').getSheetByName('工作表1');
   var lastRow = sheet.getLastRow();
   
@@ -19,33 +20,9 @@ function doGet(e) {
     
     if (sentence) {
       var sentenceStr = sentence.toString();
-      var isMatch = false;
       
-      if (type === 'single') {
-        // 【單句模式】檢查是否包含傳入的 q
-        var q = e.parameter.q;
-        if (q && sentenceStr.indexOf(q) !== -1) {
-          isMatch = true;
-        }
-      } else if (type === 'double') {
-        // 【雙詞模式】同時滿足 q1 與 q2
-        var q1 = e.parameter.q1;
-        var q2 = e.parameter.q2;
-        var matchQ1 = q1 ? sentenceStr.indexOf(q1) !== -1 : true;
-        var matchQ2 = q2 ? sentenceStr.indexOf(q2) !== -1 : true;
-        if (matchQ1 && matchQ2) {
-          isMatch = true;
-        }
-      } else {
-        // 如果沒帶 type 參數，預留舊版本的單一關鍵字 q 查詢作為相容
-        var oldQ = e.parameter.q;
-        if (oldQ && sentenceStr.indexOf(oldQ) !== -1) {
-          isMatch = true;
-        }
-      }
-      
-      // 若符合篩選條件，推進結果陣列
-      if (isMatch) {
+      // 只要句子中包含這個關鍵字，就放入結果
+      if (keyword && sentenceStr.indexOf(keyword) !== -1) {
         results.push({
           sentence: sentenceStr,
           index: index,
@@ -55,7 +32,7 @@ function doGet(e) {
     }
   }
   
-  // 回傳 JSON 格式並允許跨網域存取
+  // 回傳 JSON 格式並允許跨網域
   return ContentService.createTextOutput(JSON.stringify(results))
     .setMimeType(ContentService.MimeType.JSON);
 }
