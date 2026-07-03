@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Google Sheet 句子搜尋</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    input, button {
+      padding: 8px;
+      font-size: 16px;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      background: #f9f9f9;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 0 3px rgba(0,0,0,0.1);
+    }
+    .sentence {
+      font-weight: bold;
+      font-size: 18px;
+    }
+    .meta {
+      color: #555;
+      font-size: 14px;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h2>論語句子速查(單關鍵詞)</h2>
+  <p>請輸入關鍵詞(如君子), 將找出出現這個詞的句子</p>
+  <input type="text" id="keyword" placeholder="輸入關鍵字">
+  <button onclick="search()">搜尋</button>
+  <ul id="results"></ul>
+
+  <script>
+    function search() {
+      var q = document.getElementById('keyword').value.trim();
+      if (!q) {
+        alert("請輸入關鍵字！");
+        return;
+      }
+      
+      fetch('https://script.google.com/macros/s/AKfycby22oDU8KfsEHCOQKFmj5iOABy60W0xbsTrEDc9tYr-hVFbFKb5zLniY8cUzpxnbSwu/exec?q=' + encodeURIComponent(q))
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('網路錯誤：' + response.status);
+          }
+          return response.json();
+        })
+        .then(data => {
+          var ul = document.getElementById('results');
+          ul.innerHTML = '';
+          if (data.length === 0) {
+            ul.innerHTML = '<li>找不到符合的句子。</li>';
+            return;
+          }
+          data.forEach(function(item) {
+            var li = document.createElement('li');
+            li.innerHTML = `
+              <div class="sentence">${item.sentence}</div>
+              <div class="meta">索引：${item.index}　章節：${item.chapter}</div>
+            `;
+            ul.appendChild(li);
+          });
+        })
+        .catch(error => {
+          console.error('錯誤:', error);
+          alert('搜尋失敗，請查看 console。');
+        });
+    }
+  </script>
+</body>
+</html>
