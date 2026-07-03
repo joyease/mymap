@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>孫子句子速查(單關鍵詞)</title>
+  <style>
+    body {
+      font-family: "Microsoft JhengHei", Arial, sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      background-color: #f9f9f9;
+    }
+    h2 { color: #333; border-bottom: 2px solid #8c7853; padding-bottom: 10px; }
+    .search-box { margin-bottom: 20px; }
+    input { padding: 8px; margin-right: 5px; border: 1px solid #ccc; border-radius: 4px; width: 200px; font-size: 16px; }
+    button { padding: 8px 15px; background-color: #8c7853; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+    button:hover { background-color: #6e5d3f; }
+    ul { list-style: none; padding: 0; }
+    li { background: white; padding: 15px; margin-bottom: 10px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 4px solid #8c7853; }
+    .sentence { font-size: 1.1em; font-weight: bold; color: #222; margin-bottom: 5px; }
+    .meta { font-size: 0.9em; color: #666; }
+    .loading { color: #888; font-style: italic; }
+  </style>
+</head>
+<body>
+
+  <h2>孫子句子速查(單關鍵詞)</h2>
+  <p>請輸入關鍵詞(如：君子)，將找出出現這個詞的句子</p>
+  
+  <div class="search-box">
+    <input type="text" id="keyword" placeholder="輸入關鍵字">
+    <button onclick="search()">搜尋</button>
+  </div>
+
+  <ul id="results"></ul>
+
+  <script>
+    function search() {
+      var q = document.getElementById('keyword').value.trim();
+      var ul = document.getElementById('results');
+      
+      if (!q) {
+        alert("請輸入關鍵字！");
+        return;
+      }
+      
+      // 顯示載入中提示
+      ul.innerHTML = '<li class="loading">搜尋中，請稍候...</li>';
+      
+      // ⚠️ 請將下方的網址替換為您剛剛「全新部署」得到的網頁應用程式網址
+      var apiUrl = 'https://script.google.com/macros/s/AKfycbwnxADXzdpeOkQANAsU4iljmKOJ1lDyH-LwGCPKv7aNUQ1TtK_AOpmjw5-9auVm4YpS/exec?q=' + encodeURIComponent(q);
+      
+      fetch(apiUrl)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('網路錯誤：' + response.status);
+          }
+          return response.json();
+        })
+        .then(data => {
+          ul.innerHTML = ''; // 清空提示
+          
+          if (!data || data.length === 0) {
+            ul.innerHTML = '<li>找不到符合的句子。</li>';
+            return;
+          }
+          
+          data.forEach(function(item) {
+            var li = document.createElement('li');
+            
+            var divSentence = document.createElement('div');
+            divSentence.className = 'sentence';
+            divSentence.textContent = item.sentence; // 安全寫法
+            
+            var divMeta = document.createElement('div');
+            divMeta.className = 'meta';
+            divMeta.textContent = `索引：${item.index || '無'} ｜ 章節：${item.chapter || '無'}`;
+            
+            li.appendChild(divSentence);
+            li.appendChild(divMeta);
+            ul.appendChild(li);
+          });
+        })
+        .catch(error => {
+          console.error('錯誤:', error);
+          ul.innerHTML = '<li style="color: red;">搜尋失敗，請確認 GAS 權限開至「任何人」或檢查網址。</li>';
+        });
+    }
+  </script>
+</body>
+</html>
