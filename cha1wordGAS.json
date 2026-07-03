@@ -1,0 +1,61 @@
+function doGet(e) {
+  // 讀取搜尋模式種類 (single 或 double)
+  var type = e.parameter.type;
+  
+  var sheet = SpreadsheetApp.openById('1H6nEID60avDHip4c01XhhbI2jhi5ZI9Di6_KIGF2qKw').getSheetByName('工作表1');
+  var lastRow = sheet.getLastRow();
+  
+  if (lastRow === 0) {
+    return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
+  }
+  
+  var data = sheet.getRange(1, 1, lastRow, 3).getValues(); // 取前三欄：句子、索引、章節
+  var results = [];
+  
+  for (var i = 0; i < data.length; i++) {
+    var sentence = data[i][0];
+    var index = data[i][1];
+    var chapter = data[i][2];
+    
+    if (sentence) {
+      var sentenceStr = sentence.toString();
+      var isMatch = false;
+      
+      if (type === 'single') {
+        // 【單句模式】檢查是否包含傳入的 q
+        var q = e.parameter.q;
+        if (q && sentenceStr.indexOf(q) !== -1) {
+          isMatch = true;
+        }
+      } else if (type === 'double') {
+        // 【雙詞模式】同時滿足 q1 與 q2
+        var q1 = e.parameter.q1;
+        var q2 = e.parameter.q2;
+        var matchQ1 = q1 ? sentenceStr.indexOf(q1) !== -1 : true;
+        var matchQ2 = q2 ? sentenceStr.indexOf(q2) !== -1 : true;
+        if (matchQ1 && matchQ2) {
+          isMatch = true;
+        }
+      } else {
+        // 如果沒帶 type 參數，預留舊版本的單一關鍵字 q 查詢作為相容
+        var oldQ = e.parameter.q;
+        if (oldQ && sentenceStr.indexOf(oldQ) !== -1) {
+          isMatch = true;
+        }
+      }
+      
+      // 若符合篩選條件，推進結果陣列
+      if (isMatch) {
+        results.push({
+          sentence: sentenceStr,
+          index: index,
+          chapter: chapter
+        });
+      }
+    }
+  }
+  
+  // 回傳 JSON 格式並允許跨網域存取
+  return ContentService.createTextOutput(JSON.stringify(results))
+    .setMimeType(ContentService.MimeType.JSON);
+}
