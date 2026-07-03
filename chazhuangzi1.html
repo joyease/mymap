@@ -26,7 +26,7 @@
 <body>
 
   <h2>莊子句子速查(單關鍵詞)</h2>
-  <p>請輸入關鍵詞(如：君子)，將找出出現這個詞的句子</p>
+  <p>請輸入關鍵詞(如：北冥)，將找出出現這個詞的句子</p>
   
   <div class="search-box">
     <input type="text" id="keyword" placeholder="輸入關鍵字">
@@ -49,7 +49,7 @@
       ul.innerHTML = '<li class="loading">搜尋中，請稍候...</li>';
       
       // ⚠️ 請將下方的網址替換為您剛剛「全新部署」得到的網頁應用程式網址
-      var apiUrl = 'https://script.google.com/macros/s/AKfycbzXSgJx73dD1vJCwgNoGhhNozqtY7P8fHjG2NUkQb4n8MjjslNxS3h31CxF7hYXFFO_/exec?q=' + encodeURIComponent(q);
+      var apiUrl = 'https://script.google.com/macros/s/AKfycbxWXyxFlsGVSU9irQDkgRe64m0-RyJFORq21qyhz2sFTqxFaRHTzMtDIqiyPlzA43Wx/exec?q=' + encodeURIComponent(q);
       
       fetch(apiUrl)
         .then(response => {
