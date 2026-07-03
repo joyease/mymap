@@ -1,0 +1,43 @@
+function doGet(e) {
+  // 1. 讀取前端傳過來的雙關鍵字
+  var q1 = e.parameter.q1;
+  var q2 = e.parameter.q2;
+  
+  var sheet = SpreadsheetApp.openById('1H6nEID60avDHip4c01XhhbI2jhi5ZI9Di6_KIGF2qKw').getSheetByName('工作表1');
+  
+  // 防止試算表完全沒資料時報錯
+  var lastRow = sheet.getLastRow();
+  if (lastRow === 0) {
+    return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
+  }
+  
+  var data = sheet.getRange(1, 1, lastRow, 3).getValues(); // 取前三欄：句子、索引、章節
+  var results = [];
+  
+  for (var i = 0; i < data.length; i++) {
+    var sentence = data[i][0];
+    var index = data[i][1];
+    var chapter = data[i][2];
+    
+    if (sentence) {
+      var sentenceStr = sentence.toString();
+      
+      // 2. 核心邏輯修改：必須同時防呆（確保有輸入值）並符合「包含 q1」且「包含 q2」
+      var matchQ1 = q1 ? sentenceStr.indexOf(q1) !== -1 : true;
+      var matchQ2 = q2 ? sentenceStr.indexOf(q2) !== -1 : true;
+      
+      // 如果兩個條件都成立，才存入結果
+      if (matchQ1 && matchQ2) {
+        results.push({
+          sentence: sentenceStr,
+          index: index,
+          chapter: chapter
+        });
+      }
+    }
+  }
+  
+  // 3. 回傳 JSON 格式
+  return ContentService.createTextOutput(JSON.stringify(results))
+    .setMimeType(ContentService.MimeType.JSON);
+}
