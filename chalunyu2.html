@@ -1,0 +1,44 @@
+<h2>論語句子速查(雙關鍵詞)</h2>
+<p>請輸入兩個關鍵詞(如君子,小人), 將找出同時出現這兩個詞的句子</p>
+<input type="text" id="keyword1" placeholder="輸入關鍵字1">
+<input type="text" id="keyword2" placeholder="輸入關鍵字2">
+<button onclick="search()">搜尋</button>
+<ul id="results"></ul>
+
+<script>
+function search() {
+  var q1 = document.getElementById('keyword1').value.trim();
+  var q2 = document.getElementById('keyword2').value.trim();
+  if (!q1 || !q2) {
+    alert("請輸入兩個關鍵字！");
+    return;
+  }
+  fetch('https://script.google.com/macros/s/AKfycbwlMkAnJ-1p72y8I1HrN4I7w-C_K-xzQma0tHOjEOMPN6HwM6fBYpj-nM4B-BKRkzzd/exec?q1=' + encodeURIComponent(q1) + '&q2=' + encodeURIComponent(q2))
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('網路錯誤：' + response.status);
+      }
+      return response.json();
+    })
+    .then(data => {
+      var ul = document.getElementById('results');
+      ul.innerHTML = '';
+      if (data.length === 0) {
+        ul.innerHTML = '<li>找不到符合的句子。</li>';
+        return;
+      }
+      data.forEach(function(item) {
+        var li = document.createElement('li');
+        li.innerHTML = `
+          <div class="sentence">${item.sentence}</div>
+          <div class="meta">索引：${item.index}　章節：${item.chapter}</div>
+        `;
+        ul.appendChild(li);
+      });
+    })
+    .catch(error => {
+      console.error('錯誤:', error);
+      alert('搜尋失敗，請查看 console。');
+    });
+}
+</script>
