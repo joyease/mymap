@@ -5,19 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>台灣小百岳完登挑戰</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Serif TC", serif;
             background-color: #f8f9fa;
             color: #333;
             margin: 0;
-            padding: 20px;
+            padding: 15px 10px;
         }
 
         .container {
             max-width: 1000px;
+            width: 100%;
             margin: 0 auto;
             background: #ffffff;
-            padding: 25px;
+            padding: 20px 15px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
@@ -25,15 +30,21 @@
         h1 {
             text-align: center;
             color: #2c3e50;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
+            font-size: 24px;
         }
 
-        /* 查詢區塊 */
+        /* 查詢區塊 - 支援彈性縮放與手機換行 */
         .search-box {
             display: flex;
             justify-content: center;
+            align-items: center;
             gap: 10px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         input[type="text"] {
@@ -41,7 +52,8 @@
             font-size: 16px;
             border: 2px solid #ddd;
             border-radius: 6px;
-            width: 250px;
+            flex: 1;
+            min-width: 0; /* 防止 flex 項目溢出 */
             outline: none;
             transition: border-color 0.2s;
         }
@@ -51,13 +63,14 @@
         }
 
         button {
-            padding: 10px 20px;
+            padding: 10px 18px;
             font-size: 16px;
             background-color: #2e7d32;
             color: white;
             border: none;
             border-radius: 6px;
             cursor: pointer;
+            white-space: nowrap;
             transition: background-color 0.2s;
         }
 
@@ -70,13 +83,13 @@
             font-weight: bold;
             margin-bottom: 20px;
             min-height: 24px;
+            word-break: break-word;
         }
 
         /* ------------------ 獎狀證書樣式 ------------------ */
         .certificate-container {
             display: none; /* 預設隱藏，查詢到使用者才顯示 */
             
-            /* 群山漸層底色 */
             background: linear-gradient(135deg, 
                 #f2f7f5 0%, 
                 #e1ece9 35%, 
@@ -84,128 +97,124 @@
                 #3a6b6c 100%
             );
             
-            border: 8px double #c5a059;
+            border: 6px double #c5a059;
             border-radius: 8px;
-            padding: 40px 30px;
-            margin: 0 auto 35px auto;
+            padding: 30px 15px;
+            margin: 0 auto 30px auto;
             max-width: 720px;
+            width: 100%;
             text-align: center;
             position: relative;
             box-shadow: 0 12px 28px rgba(0,0,0,0.12);
-            box-sizing: border-box;
             color: #1a332e;
-            overflow: hidden; /* 確保左右側台灣地圖不超出框線 */
+            overflow: hidden;
         }
 
-        /* 證書內框金色細邊線 */
         .certificate-container::before {
             content: "";
             position: absolute;
-            top: 8px; left: 8px; right: 8px; bottom: 8px;
+            top: 6px; left: 6px; right: 6px; bottom: 6px;
             border: 1px solid #d4af37;
             pointer-events: none;
             z-index: 2;
         }
 
-        /* 台灣山脈地形水墨地圖 - 通用基底 */
+        /* 台灣山脈地形水墨地圖 - 彈性寬度 */
         .taiwan-map-bg {
             position: absolute;
-            top: 10%;
-            width: 240px;
-            height: 80%;
-            opacity: 0.38; /* 柔和半透明，不影響上方文字閱讀 */
+            top: 5%;
+            width: 35%;
+            max-width: 220px;
+            height: 90%;
+            opacity: 0.3;
             pointer-events: none;
             z-index: 1;
         }
 
-        /* 右側地圖（向左淡出） */
         .taiwan-map-bg.right-map {
-            right: 15px;
-            mask-image: linear-gradient(to left, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
-            -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
+            right: 5px;
+            mask-image: linear-gradient(to left, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
+            -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
         }
 
-        /* 左側地圖（向右淡出，呈現對稱之美） */
         .taiwan-map-bg.left-map {
-            left: 15px;
-            mask-image: linear-gradient(to right, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
-            -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
+            left: 5px;
+            mask-image: linear-gradient(to right, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
+            -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
         }
 
-        /* 證書內容層級（確保高於地圖背景） */
         .cert-content {
             position: relative;
             z-index: 3;
         }
 
         .cert-title {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: bold;
             color: #183e35;
-            letter-spacing: 4px;
-            margin-bottom: 25px;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
             border-bottom: 2px solid #c5a059;
             display: inline-block;
-            padding-bottom: 8px;
+            padding-bottom: 6px;
         }
 
         .cert-body {
-            font-size: 18px;
-            line-height: 2;
+            font-size: 16px;
+            line-height: 1.8;
             color: #1c352d;
-            margin: 20px 0 25px 0;
+            margin: 15px 0 20px 0;
+            word-break: break-word;
         }
 
         .cert-highlight {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
             color: #0d47a1;
             border-bottom: 2px solid #0d47a1;
-            padding: 0 8px;
-            margin: 0 4px;
+            padding: 0 4px;
+            margin: 0 2px;
+            display: inline-block;
         }
 
         .cert-count {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: bold;
             color: #b71c1c;
-            padding: 0 6px;
+            padding: 0 4px;
         }
 
         .cert-proof {
-            font-size: 16px;
+            font-size: 15px;
             color: #2e4d44;
             margin-top: 10px;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
         }
 
-        /* 底部資訊區域 (全部置中) */
         .cert-footer-group {
-            margin-top: 30px;
+            margin-top: 25px;
             text-align: center;
         }
 
-        /* 平台名稱與右側認證徽章併排區塊 */
         .cert-org-row {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
             margin-bottom: 8px;
         }
 
-        /* 平台名稱 (改為深藍色字體) */
         .cert-org {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             color: #0d47a1;
             letter-spacing: 1px;
         }
 
-        /* 認證金屬章 */
         .cert-badge {
-            width: 88px;
-            height: 38px;
+            width: 80px;
+            height: 34px;
             background: radial-gradient(circle, #f39c12, #d35400);
             border-radius: 50%;
             display: flex;
@@ -219,9 +228,8 @@
             flex-shrink: 0;
         }
 
-        /* 日期置中 (改為深藍色字體) */
         .cert-date {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: bold;
             color: #1565c0;
             text-align: center;
@@ -236,7 +244,7 @@
         }
 
         .county-title {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: bold;
             color: #34495e;
             margin-bottom: 12px;
@@ -245,23 +253,23 @@
         .mountains-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
+            justify-content: flex-start;
         }
 
         .mountain-circle {
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 85px;
-            height: 85px;
+            width: 72px;
+            height: 72px;
             border-radius: 50%;
             background-color: #e0e0e0;
             color: #424242;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 500;
             text-align: center;
-            padding: 8px;
-            box-sizing: border-box;
+            padding: 6px;
             word-break: break-all;
             transition: all 0.3s ease;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
@@ -273,6 +281,68 @@
             font-weight: bold;
             box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
             transform: scale(1.05);
+        }
+
+        /* ------------------ 手機端媒體查詢 (RWD) ------------------ */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px 5px;
+            }
+
+            .container {
+                padding: 15px 10px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .search-box {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            input[type="text"] {
+                width: 100%;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .certificate-container {
+                padding: 25px 10px;
+            }
+
+            .cert-title {
+                font-size: 20px;
+                letter-spacing: 2px;
+            }
+
+            .cert-body {
+                font-size: 15px;
+            }
+
+            .cert-highlight {
+                font-size: 18px;
+            }
+
+            .cert-count {
+                font-size: 20px;
+            }
+
+            .mountain-circle {
+                width: 65px;
+                height: 65px;
+                font-size: 11px;
+                padding: 4px;
+            }
+
+            /* 手機上記錄寬度較小，避免背景圖淹沒文字 */
+            .taiwan-map-bg {
+                opacity: 0.2;
+                width: 40%;
+            }
         }
     </style>
 </head>
@@ -290,7 +360,7 @@
 
     <!-- 獎狀證書區塊 -->
     <div id="certificate" class="certificate-container">
-        <!-- 左側 AI 繪製風格的臺灣地形山脈地圖背景（向右漸隱） -->
+        <!-- 左側 AI 繪製風格的臺灣地形山脈地圖背景 -->
         <svg class="taiwan-map-bg left-map" viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg">
             <defs>
                 <linearGradient id="landGradLeft" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -306,7 +376,7 @@
             <path d="M80,80 C90,110 95,150 92,190 C88,230 75,270 68,300" fill="none" stroke="#d8f3dc" stroke-width="1.2" />
         </svg>
 
-        <!-- 右側 AI 繪製風格的臺灣地形山脈地圖背景（向左漸隱） -->
+        <!-- 右側 AI 繪製風格的臺灣地形山脈地圖背景 -->
         <svg class="taiwan-map-bg right-map" viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg">
             <defs>
                 <linearGradient id="landGradRight" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -330,12 +400,10 @@
             </div>
             
             <div class="cert-footer-group">
-                <!-- 平台名稱與認證圓圈同列 -->
                 <div class="cert-org-row">
                     <div class="cert-org">MySports運動社群平台</div>
                     <div class="cert-badge">MySports</div>
                 </div>
-                <!-- 日期置於下一列 -->
                 <div class="cert-date">2026 年 7 月 31 日</div>
             </div>
         </div>
