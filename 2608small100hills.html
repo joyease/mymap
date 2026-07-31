@@ -76,48 +76,74 @@
         .certificate-container {
             display: none; /* 預設隱藏，查詢到使用者才顯示 */
             
-            /* 將山巒圖片設為背景，並加上微透明遮罩確保文字閱讀性 */
-            background: linear-gradient(rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.45)), 
-                        url('image_67d1d5.jpg') center/cover no-repeat;
+            /* 群山漸層底色 */
+            background: linear-gradient(135deg, 
+                #f2f7f5 0%, 
+                #e1ece9 35%, 
+                #b2cec7 70%, 
+                #3a6b6c 100%
+            );
             
             border: 8px double #c5a059;
             border-radius: 8px;
-            padding: 35px 25px;
+            padding: 40px 30px;
             margin: 0 auto 35px auto;
-            max-width: 700px;
+            max-width: 720px;
             text-align: center;
             position: relative;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.12);
             box-sizing: border-box;
+            color: #1a332e;
+            overflow: hidden; /* 確保右側台灣地圖不超出框線 */
         }
 
+        /* 證書內框金色細邊線 */
         .certificate-container::before {
             content: "";
             position: absolute;
             top: 8px; left: 8px; right: 8px; bottom: 8px;
             border: 1px solid #d4af37;
             pointer-events: none;
+            z-index: 2;
+        }
+
+        /* 右側 AI 生成風 台灣山脈地形水墨地圖 */
+        .taiwan-map-bg {
+            position: absolute;
+            top: 10%;
+            right: 15px;
+            width: 240px;
+            height: 80%;
+            opacity: 0.38; /* 柔和半透明，不影響上方文字閱讀 */
+            pointer-events: none;
+            z-index: 1;
+            /* 向左淡出漸變，與背景完美融合 */
+            mask-image: linear-gradient(to left, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
+            -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
+        }
+
+        /* 證書內容層級（確保高於地圖背景） */
+        .cert-content {
+            position: relative;
+            z-index: 3;
         }
 
         .cert-title {
             font-size: 28px;
             font-weight: bold;
-            color: #1a382b;
-            letter-spacing: 3px;
+            color: #183e35;
+            letter-spacing: 4px;
             margin-bottom: 25px;
             border-bottom: 2px solid #c5a059;
             display: inline-block;
             padding-bottom: 8px;
-            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
         }
 
         .cert-body {
             font-size: 18px;
             line-height: 2;
-            color: #1c2d27;
-            margin: 20px 0 30px 0;
-            font-weight: 500;
-            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+            color: #1c352d;
+            margin: 20px 0 25px 0;
         }
 
         .cert-highlight {
@@ -130,7 +156,7 @@
         }
 
         .cert-count {
-            font-size: 26px;
+            font-size: 28px;
             font-weight: bold;
             color: #b71c1c;
             padding: 0 6px;
@@ -141,28 +167,36 @@
             color: #2e4d44;
             margin-top: 10px;
             letter-spacing: 2px;
-            font-weight: bold;
         }
 
-        .cert-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
+        /* 底部資訊區域 (全部置中) */
+        .cert-footer-group {
             margin-top: 30px;
-            padding: 0 20px;
+            text-align: center;
         }
 
+        /* 平台名稱與右側認證徽章併排區塊 */
+        .cert-org-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        /* 平台名稱 */
         .cert-org {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
-            color: #0f2c23;
-            text-align: left;
-            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+            color: #ffffff;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+            letter-spacing: 1px;
         }
 
+        /* 認證金屬章（改接在平台名稱右邊） */
         .cert-badge {
-            width: 60px;
-            height: 60px;
+            width: 38px;
+            height: 38px;
             background: radial-gradient(circle, #f39c12, #d35400);
             border-radius: 50%;
             display: flex;
@@ -170,20 +204,19 @@
             justify-content: center;
             color: white;
             font-weight: bold;
-            font-size: 13px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            font-size: 11px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
             border: 2px solid #fff;
+            flex-shrink: 0;
         }
 
-        /* 日期獨立一列樣式 */
+        /* 日期置中 */
         .cert-date {
             font-size: 15px;
-            color: #1a382b;
-            text-align: right;
-            margin-top: 15px;
-            padding-right: 20px;
-            font-weight: bold;
-            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+            color: #e0f2f1;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            letter-spacing: 1px;
         }
 
         /* ------------------ 縣市與山嶽樣式 ------------------ */
@@ -248,18 +281,41 @@
 
     <!-- 獎狀證書區塊 -->
     <div id="certificate" class="certificate-container">
-        <div class="cert-title">完登小百岳證書</div>
-        <div class="cert-body">
-            恭喜 <span id="certName" class="cert-highlight">--</span> 已經完成 <span id="certCount" class="cert-count">0</span> 座小百岳
-            <div class="cert-proof">特頒此證，以資證明！</div>
+        <!-- 右側 AI 繪製風格的臺灣地形山脈地圖背景 -->
+        <svg class="taiwan-map-bg" viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="landGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#1b4332" stop-opacity="0.7"/>
+                    <stop offset="50%" stop-color="#2d6a4f" stop-opacity="0.9"/>
+                    <stop offset="100%" stop-color="#081c15" stop-opacity="0.8"/>
+                </linearGradient>
+            </defs>
+            <!-- 臺灣島嶼輪廓 -->
+            <path d="M110,20 C130,35 155,70 160,110 C165,150 150,200 135,250 C120,300 95,340 85,370 C75,380 65,375 60,350 C50,310 40,260 45,210 C50,160 70,100 85,50 C95,20 100,10 110,20 Z" fill="url(#landGrad)" />
+            <!-- 中央山脈與脊樑山地等高褶皺線 -->
+            <path d="M100,40 C115,70 120,120 125,170 C120,220 105,270 85,330" fill="none" stroke="#74c69d" stroke-width="2.5" stroke-dasharray="4,2" />
+            <path d="M90,60 C105,90 110,140 112,190 C108,240 92,290 78,340" fill="none" stroke="#b7e4c7" stroke-width="1.8" />
+            <path d="M112,80 C128,120 132,160 130,210 C122,250 110,280 92,320" fill="none" stroke="#52b788" stroke-width="1.5" />
+            <path d="M80,80 C90,110 95,150 92,190 C88,230 75,270 68,300" fill="none" stroke="#d8f3dc" stroke-width="1.2" />
+        </svg>
+
+        <div class="cert-content">
+            <div class="cert-title">完登小百岳證書</div>
+            <div class="cert-body">
+                恭喜 <span id="certName" class="cert-highlight">--</span> 已經完成 <span id="certCount" class="cert-count">0</span> 座小百岳
+                <div class="cert-proof">特頒此證，以資證明！</div>
+            </div>
+            
+            <div class="cert-footer-group">
+                <!-- 平台名稱與認證圓圈同列 -->
+                <div class="cert-org-row">
+                    <div class="cert-org">MySports 運動社群平台</div>
+                    <div class="cert-badge">認證</div>
+                </div>
+                <!-- 日期置於下一列 -->
+                <div class="cert-date">2026 年</div>
+            </div>
         </div>
-        
-        <div class="cert-footer">
-            <div class="cert-org">MySports 運動社群平台</div>
-            <div class="cert-badge">認證</div>
-        </div>
-        <!-- 日期拆至下一列 -->
-        <div class="cert-date">2026 年</div>
     </div>
 
     <div id="mountainsList"></div>
