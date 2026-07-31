@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>台灣小百岳踩點查詢</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Serif TC", serif;
+            background-color: #f8f9fa;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 25px;
+        }
+
+        /* 查詢區塊 */
+        .search-box {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        input[type="text"] {
+            padding: 10px 15px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            width: 250px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #2e7d32;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #1b5e20;
+        }
+
+        .status-message {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+            min-height: 24px;
+        }
+
+        /* ------------------ 獎狀證書樣式 ------------------ */
+        .certificate-container {
+            display: none; /* 預設隱藏，查詢到使用者才顯示 */
+            
+            /* 群山漸層底色 */
+            background: linear-gradient(135deg, 
+                #f2f7f5 0%, 
+                #e1ece9 35%, 
+                #b2cec7 70%, 
+                #3a6b6c 100%
+            );
+            
+            border: 8px double #c5a059;
+            border-radius: 8px;
+            padding: 40px 30px;
+            margin: 0 auto 35px auto;
+            max-width: 720px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+            box-sizing: border-box;
+            color: #1a332e;
+            overflow: hidden; /* 確保左右側台灣地圖不超出框線 */
+        }
+
+        /* 證書內框金色細邊線 */
+        .certificate-container::before {
+            content: "";
+            position: absolute;
+            top: 8px; left: 8px; right: 8px; bottom: 8px;
+            border: 1px solid #d4af37;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* 台灣山脈地形水墨地圖 - 通用基底 */
+        .taiwan-map-bg {
+            position: absolute;
+            top: 10%;
+            width: 240px;
+            height: 80%;
+            opacity: 0.38; /* 柔和半透明，不影響上方文字閱讀 */
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* 右側地圖（向左淡出） */
+        .taiwan-map-bg.right-map {
+            right: 15px;
+            mask-image: linear-gradient(to left, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
+            -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
+        }
+
+        /* 左側地圖（向右淡出，呈現對稱之美） */
+        .taiwan-map-bg.left-map {
+            left: 15px;
+            mask-image: linear-gradient(to right, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
+            -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
+        }
+
+        /* 證書內容層級（確保高於地圖背景） */
+        .cert-content {
+            position: relative;
+            z-index: 3;
+        }
+
+        .cert-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #183e35;
+            letter-spacing: 4px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #c5a059;
+            display: inline-block;
+            padding-bottom: 8px;
+        }
+
+        .cert-body {
+            font-size: 18px;
+            line-height: 2;
+            color: #1c352d;
+            margin: 20px 0 25px 0;
+        }
+
+        .cert-highlight {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0d47a1;
+            border-bottom: 2px solid #0d47a1;
+            padding: 0 8px;
+            margin: 0 4px;
+        }
+
+        .cert-count {
+            font-size: 28px;
+            font-weight: bold;
+            color: #b71c1c;
+            padding: 0 6px;
+        }
+
+        .cert-proof {
+            font-size: 16px;
+            color: #2e4d44;
+            margin-top: 10px;
+            letter-spacing: 2px;
+        }
+
+        /* 底部資訊區域 (全部置中) */
+        .cert-footer-group {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        /* 平台名稱與右側認證徽章併排區塊 */
+        .cert-org-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        /* 平台名稱 (改為深藍色字體) */
+        .cert-org {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0d47a1;
+            letter-spacing: 1px;
+        }
+
+        /* 認證金屬章 */
+        .cert-badge {
+            width: 38px;
+            height: 38px;
+            background: radial-gradient(circle, #f39c12, #d35400);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 11px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            border: 2px solid #fff;
+            flex-shrink: 0;
+        }
+
+        /* 日期置中 (改為深藍色字體) */
+        .cert-date {
+            font-size: 15px;
+            font-weight: bold;
+            color: #1565c0;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        /* ------------------ 縣市與山嶽樣式 ------------------ */
+        .county-group {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .county-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #34495e;
+            margin-bottom: 12px;
+        }
+
+        .mountains-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .mountain-circle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 85px;
+            height: 85px;
+            border-radius: 50%;
+            background-color: #e0e0e0;
+            color: #424242;
+            font-size: 13px;
+            font-weight: 500;
+            text-align: center;
+            padding: 8px;
+            box-sizing: border-box;
+            word-break: break-all;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .mountain-circle.visited {
+            background-color: #4caf50;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>台灣小百岳踩點查詢</h1>
+    
+    <div class="search-box">
+        <input type="text" id="nicknameInput" placeholder="請輸入暱稱（例如：小明）">
+        <button onclick="searchUser()">查詢踩點紀錄</button>
+    </div>
+
+    <div id="statusMessage" class="status-message"></div>
+
+    <!-- 獎狀證書區塊 -->
+    <div id="certificate" class="certificate-container">
+        <!-- 左側 AI 繪製風格的臺灣地形山脈地圖背景（向右漸隱） -->
+        <svg class="taiwan-map-bg left-map" viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="landGradLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#1b4332" stop-opacity="0.7"/>
+                    <stop offset="50%" stop-color="#2d6a4f" stop-opacity="0.9"/>
+                    <stop offset="100%" stop-color="#081c15" stop-opacity="0.8"/>
+                </linearGradient>
+            </defs>
+            <path d="M110,20 C130,35 155,70 160,110 C165,150 150,200 135,250 C120,300 95,340 85,370 C75,380 65,375 60,350 C50,310 40,260 45,210 C50,160 70,100 85,50 C95,20 100,10 110,20 Z" fill="url(#landGradLeft)" />
+            <path d="M100,40 C115,70 120,120 125,170 C120,220 105,270 85,330" fill="none" stroke="#74c69d" stroke-width="2.5" stroke-dasharray="4,2" />
+            <path d="M90,60 C105,90 110,140 112,190 C108,240 92,290 78,340" fill="none" stroke="#b7e4c7" stroke-width="1.8" />
+            <path d="M112,80 C128,120 132,160 130,210 C122,250 110,280 92,320" fill="none" stroke="#52b788" stroke-width="1.5" />
+            <path d="M80,80 C90,110 95,150 92,190 C88,230 75,270 68,300" fill="none" stroke="#d8f3dc" stroke-width="1.2" />
+        </svg>
+
+        <!-- 右側 AI 繪製風格的臺灣地形山脈地圖背景（向左漸隱） -->
+        <svg class="taiwan-map-bg right-map" viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="landGradRight" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#1b4332" stop-opacity="0.7"/>
+                    <stop offset="50%" stop-color="#2d6a4f" stop-opacity="0.9"/>
+                    <stop offset="100%" stop-color="#081c15" stop-opacity="0.8"/>
+                </linearGradient>
+            </defs>
+            <path d="M110,20 C130,35 155,70 160,110 C165,150 150,200 135,250 C120,300 95,340 85,370 C75,380 65,375 60,350 C50,310 40,260 45,210 C50,160 70,100 85,50 C95,20 100,10 110,20 Z" fill="url(#landGradRight)" />
+            <path d="M100,40 C115,70 120,120 125,170 C120,220 105,270 85,330" fill="none" stroke="#74c69d" stroke-width="2.5" stroke-dasharray="4,2" />
+            <path d="M90,60 C105,90 110,140 112,190 C108,240 92,290 78,340" fill="none" stroke="#b7e4c7" stroke-width="1.8" />
+            <path d="M112,80 C128,120 132,160 130,210 C122,250 110,280 92,320" fill="none" stroke="#52b788" stroke-width="1.5" />
+            <path d="M80,80 C90,110 95,150 92,190 C88,230 75,270 68,300" fill="none" stroke="#d8f3dc" stroke-width="1.2" />
+        </svg>
+
+        <div class="cert-content">
+            <div class="cert-title">完登小百岳證書</div>
+            <div class="cert-body">
+                恭喜 <span id="certName" class="cert-highlight">--</span> 已經完成 <span id="certCount" class="cert-count">0</span> 座小百岳
+                <div class="cert-proof">特頒此證，以資證明！</div>
+            </div>
+            
+            <div class="cert-footer-group">
+                <!-- 平台名稱與認證圓圈同列 -->
+                <div class="cert-org-row">
+                    <div class="cert-org">MySports 運動社群平台</div>
+                    <div class="cert-badge">認證</div>
+                </div>
+                <!-- 日期置於下一列 -->
+                <div class="cert-date">2026 年</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="mountainsList"></div>
+</div>
+
+<script>
+    const mountainsData = [
+        { county: "台北市", name: "七星山" }, { county: "台北市", name: "二格山" }, { county: "台北市", name: "大屯山" }, { county: "台北市", name: "大崙頭山" }, { county: "台北市", name: "南港山" }, { county: "台北市", name: "劍潭山" },
+        { county: "台南市", name: "大凍山" }, { county: "台南市", name: "竹子尖山" }, { county: "台南市", name: "崜牛湖山" }, { county: "台南市", name: "崁頭山" },
+        { county: "台中市", name: "三汀山" }, { county: "台中市", name: "阿罩霧山" }, { county: "台中市", name: "南觀音山" }, { county: "台中市", name: "稍來山" }, { county: "台中市", name: "暗影山" }, { county: "台中市", name: "聚興山" }, { county: "台中市", name: "頭巃山" }, { county: "台中市", name: "鐵砧山" },
+        { county: "台東縣", name: "太麻里山" }, { county: "台東縣", name: "巴塱衛山" }, { county: "台東縣", name: "加奈美山" }, { county: "台東縣", name: "紅頭山" }, { county: "台東縣", name: "都蘭山" },
+        { county: "宜蘭縣", name: "三角崙山" }, { county: "宜蘭縣", name: "三星山" }, { county: "宜蘭縣", name: "鵲子山" }, { county: "宜蘭縣", name: "灣坑頭山" },
+        { county: "花蓮縣", name: "八里灣山" }, { county: "花蓮縣", name: "月眉山" }, { county: "花蓮縣", name: "卡拉寶山" }, { county: "花蓮縣", name: "立霧山" }, { county: "花蓮縣", name: "初音山" }, { county: "花蓮縣", name: "萬人山" }, { county: "花蓮縣", name: "鯉魚山" },
+        { county: "金門縣", name: "太武山" },
+        { county: "南投縣", name: "九份二山" }, { county: "南投縣", name: "大橫屏山" }, { county: "南投縣", name: "松柏坑山" }, { county: "南投縣", name: "金柑樹山" }, { county: "南投縣", name: "後尖山" }, { county: "南投縣", name: "集集大山" }, { county: "南投縣", name: "鳳凰山" }, { county: "南投縣", name: "貓囒山" },
+        { county: "屏東縣", name: "大山母山" }, { county: "屏東縣", name: "女乃山" }, { county: "屏東縣", name: "尾寮山" }, { county: "屏東縣", name: "里龍山" }, { county: "屏東縣", name: "笠頂山" }, { county: "屏東縣", name: "棚集山" },
+        { county: "苗栗縣", name: "火炎山" }, { county: "苗栗縣", name: "仙山" }, { county: "苗栗縣", name: "加里山" }, { county: "苗栗縣", name: "向天湖山" }, { county: "苗栗縣", name: "馬那邦山" }, { county: "苗栗縣", name: "關刀山" },
+        { county: "桃園市", name: "石門山" }, { county: "桃園市", name: "東眼山" }, { county: "桃園市", name: "金面山" }, { county: "桃園市", name: "溪洲山" },
+        { county: "基隆市", name: "大武崙山" }, { county: "基隆市", name: "姜子寮山" }, { county: "基隆市", name: "紅淡山" }, { county: "基隆市", name: "槓子寮山" },
+        { county: "連江縣", name: "雲台山" },
+        { county: "雲林縣", name: "石壁山" }, { county: "雲林縣", name: "雲嘉大尖山" },
+        { county: "新北市", name: "土庫岳" }, { county: "新北市", name: "大棟山" }, { county: "新北市", name: "五分山" }, { county: "新北市", name: "天上山" }, { county: "新北市", name: "汐止大尖山" }, { county: "新北市", name: "南勢角山" }, { county: "新北市", name: "基隆山" }, { county: "新北市", name: "獅仔頭山" }, { county: "新北市", name: "鳶山" }, { county: "新北市", name: "觀音山" },
+        { county: "新竹市", name: "18尖山" },
+        { county: "新竹縣", name: "五指山" }, { county: "新竹縣", name: "石牛山" }, { county: "新竹縣", name: "李棟山" }, { county: "新竹縣", name: "飛鳳山" }, { county: "新竹縣", name: "獅頭山" }, { county: "新竹縣", name: "鵝公髻山" },
+        { county: "嘉義市", name: "紅毛埤山" },
+        { county: "嘉義縣", name: "三腳南山" }, { county: "嘉義縣", name: "大凍山" }, { county: "嘉義縣", name: "大湖尖山" }, { county: "嘉義縣", name: "大塔山" }, { county: "嘉義縣", name: "梨子腳山" }, { county: "嘉義縣", name: "獨立山" },
+        { county: "彰化縣", name: "橫山" },
+        { county: "澎湖縣", name: "蛇頭山" },
+        { county: "高雄市", name: "大崗山" }, { county: "高雄市", name: "白雲山" }, { county: "高雄市", name: "西阿里關山" }, { county: "高雄市", name: "壽山" }, { county: "高雄市", name: "旗尾山" }, { county: "高雄市", name: "鳴海山" }, { county: "高雄市", name: "藤枝山" }, { county: "高雄市", name: "觀音山" }
+    ];
+
+    let usersData = [];
+
+    async function init() {
+        renderMountains();
+        await loadUserData();
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const nameParam = urlParams.get('name');
+        if (nameParam) {
+            document.getElementById('nicknameInput').value = nameParam;
+            searchUser();
+        }
+    }
+
+    async function loadUserData() {
+        const statusEl = document.getElementById('statusMessage');
+        const jsonUrl = 'https://joyease.github.io/mymap/2608small100users.json';
+        
+        try {
+            const response = await fetch(`${jsonUrl}?t=${new Date().getTime()}`);
+            if (!response.ok) throw new Error(`HTTP 錯誤！狀態碼：${response.status}`);
+            usersData = await response.json();
+        } catch (error) {
+            console.error('載入資料錯誤：', error);
+            statusEl.style.color = '#d32f2f';
+            statusEl.innerText = '讀取使用者資料失敗，請確認網址或網路連線。';
+        }
+    }
+
+    function renderMountains() {
+        const listContainer = document.getElementById('mountainsList');
+        listContainer.innerHTML = '';
+
+        const grouped = {};
+        mountainsData.forEach((mountain, index) => {
+            if (!grouped[mountain.county]) grouped[mountain.county] = [];
+            grouped[mountain.county].push({ name: mountain.name, globalIndex: index });
+        });
+
+        for (const county in grouped) {
+            const groupDiv = document.createElement('div');
+            groupDiv.className = 'county-group';
+
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'county-title';
+            titleDiv.innerText = `${county}（${grouped[county].length}座）`;
+            groupDiv.appendChild(titleDiv);
+
+            const containerDiv = document.createElement('div');
+            containerDiv.className = 'mountains-container';
+
+            grouped[county].forEach(item => {
+                const circle = document.createElement('div');
+                circle.className = 'mountain-circle';
+                circle.innerText = item.name;
+                circle.id = `mountain-${item.globalIndex}`;
+                containerDiv.appendChild(circle);
+            });
+
+            groupDiv.appendChild(containerDiv);
+            listContainer.appendChild(groupDiv);
+        }
+    }
+
+    function searchUser() {
+        const inputName = document.getElementById('nicknameInput').value.trim();
+        const statusEl = document.getElementById('statusMessage');
+        const certEl = document.getElementById('certificate');
+
+        document.querySelectorAll('.mountain-circle').forEach(circle => {
+            circle.classList.remove('visited');
+        });
+        certEl.style.display = 'none';
+
+        if (!inputName) {
+            statusEl.style.color = '#d32f2f';
+            statusEl.innerText = '請輸入暱稱！';
+            return;
+        }
+
+        const user = usersData.find(u => u.nickname === inputName);
+
+        if (user) {
+            user.record.forEach((status, index) => {
+                if (status === 1) {
+                    const circle = document.getElementById(`mountain-${index}`);
+                    if (circle) circle.classList.add('visited');
+                }
+            });
+
+            const displayCount = user.count !== undefined ? user.count : user.record.filter(x => x === 1).length;
+
+            document.getElementById('certName').innerText = user.nickname;
+            document.getElementById('certCount').innerText = displayCount;
+            
+            certEl.style.display = 'block';
+
+            statusEl.style.color = '#2e7d32';
+            statusEl.innerText = `找到「${user.nickname}」的紀錄！證書已生成於下方。`;
+        } else {
+            statusEl.style.color = '#d32f2f';
+            statusEl.innerText = `找不到暱稱「${inputName}」的資料。`;
+        }
+    }
+
+    document.getElementById('nicknameInput').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') searchUser();
+    });
+
+    window.onload = init;
+</script>
+
+</body>
+</html>
