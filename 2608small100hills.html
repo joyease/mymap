@@ -75,18 +75,28 @@
         /* ------------------ 獎狀證書樣式 ------------------ */
         .certificate-container {
             display: none; /* 預設隱藏，查詢到使用者才顯示 */
-            background: #fffdf7;
+            
+            /* 模擬群山墨綠漸層底色 (上淺綠白 -> 中灰青藍 -> 下深山青綠) */
+            background: linear-gradient(180deg, 
+                #f2f7f5 0%, 
+                #e1ece9 40%, 
+                #b2cec7 70%, 
+                #3a6b6c 100%
+            );
+            
             border: 8px double #c5a059;
             border-radius: 8px;
-            padding: 35px 25px;
+            padding: 40px 30px;
             margin: 0 auto 35px auto;
             max-width: 700px;
             text-align: center;
             position: relative;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.12);
             box-sizing: border-box;
+            color: #1a332e;
         }
 
+        /* 證書內框金色細邊線 */
         .certificate-container::before {
             content: "";
             position: absolute;
@@ -98,8 +108,8 @@
         .cert-title {
             font-size: 28px;
             font-weight: bold;
-            color: #2a3d2b;
-            letter-spacing: 3px;
+            color: #183e35;
+            letter-spacing: 4px;
             margin-bottom: 25px;
             border-bottom: 2px solid #c5a059;
             display: inline-block;
@@ -109,51 +119,66 @@
         .cert-body {
             font-size: 18px;
             line-height: 2;
-            color: #444;
-            margin: 20px 0 30px 0;
+            color: #243e36;
+            margin: 20px 0 25px 0;
         }
 
         .cert-highlight {
             font-size: 24px;
             font-weight: bold;
-            color: #1b5e20;
-            border-bottom: 2px solid #1b5e20;
+            color: #0d47a1;
+            border-bottom: 2px solid #0d47a1;
             padding: 0 8px;
             margin: 0 4px;
         }
 
         .cert-count {
-            font-size: 26px;
+            font-size: 28px;
             font-weight: bold;
-            color: #d32f2f;
+            color: #b71c1c;
             padding: 0 6px;
         }
 
         .cert-proof {
             font-size: 16px;
-            color: #666;
+            color: #2e4d44;
             margin-top: 10px;
             letter-spacing: 2px;
         }
 
-        .cert-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
+        /* 底部資訊區域 (全部居中) */
+        .cert-footer-group {
             margin-top: 30px;
-            padding: 0 20px;
+            text-align: center;
         }
 
+        /* 平台名稱置中 (顏色轉淺淡白/金底以對應漸層背景) */
         .cert-org {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
-            color: #2c3e50;
-            text-align: left;
+            color: #ffffff;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
         }
 
+        /* 日期置中 */
+        .cert-date {
+            font-size: 15px;
+            color: #e0f2f1;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        /* 金屬徽章 (改為絕對定位放在右下角，避免干擾居中文字) */
         .cert-badge {
-            width: 60px;
-            height: 60px;
+            position: absolute;
+            bottom: 25px;
+            right: 25px;
+            width: 55px;
+            height: 55px;
             background: radial-gradient(circle, #f39c12, #d35400);
             border-radius: 50%;
             display: flex;
@@ -162,17 +187,8 @@
             color: white;
             font-weight: bold;
             font-size: 13px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             border: 2px solid #fff;
-        }
-
-        /* 日期獨立一列樣式 */
-        .cert-date {
-            font-size: 15px;
-            color: #555;
-            text-align: right;
-            margin-top: 15px;
-            padding-right: 20px;
         }
 
         /* ------------------ 縣市與山嶽樣式 ------------------ */
@@ -226,10 +242,10 @@
 <body>
 
 <div class="container">
-    <h1>台灣小百岳完登挑戰</h1>
+    <h1>台灣小百岳踩點查詢</h1>
     
     <div class="search-box">
-        <input type="text" id="nicknameInput" placeholder="請輸入暱稱（例如：Hua）">
+        <input type="text" id="nicknameInput" placeholder="請輸入暱稱（例如：小明）">
         <button onclick="searchUser()">查詢踩點紀錄</button>
     </div>
 
@@ -243,12 +259,14 @@
             <div class="cert-proof">特頒此證，以資證明！</div>
         </div>
         
-        <div class="cert-footer">
+        <!-- 平台名稱與日期，均在該列中間 -->
+        <div class="cert-footer-group">
             <div class="cert-org">MySports 運動社群平台</div>
-            <div class="cert-badge">認證</div>
+            <div class="cert-date">2026 年</div>
         </div>
-        <!-- 日期拆至下一列 -->
-        <div class="cert-date">2026 年 8 月 1日</div>
+
+        <!-- 認證章移至右側作為印記點綴 -->
+        <div class="cert-badge">認證</div>
     </div>
 
     <div id="mountainsList"></div>
