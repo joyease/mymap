@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>台灣小百岳踩點查詢</title>
+    <title>台灣小百岳完登挑戰</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Serif TC", serif;
@@ -94,7 +94,7 @@
             box-shadow: 0 12px 28px rgba(0,0,0,0.12);
             box-sizing: border-box;
             color: #1a332e;
-            overflow: hidden; /* 確保右側台灣地圖不超出框線 */
+            overflow: hidden; /* 確保左右側台灣地圖不超出框線 */
         }
 
         /* 證書內框金色細邊線 */
@@ -107,19 +107,29 @@
             z-index: 2;
         }
 
-        /* 右側 AI 生成風 台灣山脈地形水墨地圖 */
+        /* 台灣山脈地形水墨地圖 - 通用基底 */
         .taiwan-map-bg {
             position: absolute;
             top: 10%;
-            right: 15px;
             width: 240px;
             height: 80%;
             opacity: 0.38; /* 柔和半透明，不影響上方文字閱讀 */
             pointer-events: none;
             z-index: 1;
-            /* 向左淡出漸變，與背景完美融合 */
+        }
+
+        /* 右側地圖（向左淡出） */
+        .taiwan-map-bg.right-map {
+            right: 15px;
             mask-image: linear-gradient(to left, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
             -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
+        }
+
+        /* 左側地圖（向右淡出，呈現對稱之美） */
+        .taiwan-map-bg.left-map {
+            left: 15px;
+            mask-image: linear-gradient(to right, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
+            -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
         }
 
         /* 證書內容層級（確保高於地圖背景） */
@@ -184,18 +194,17 @@
             margin-bottom: 8px;
         }
 
-        /* 平台名稱 */
+        /* 平台名稱 (改為深藍色字體) */
         .cert-org {
             font-size: 18px;
             font-weight: bold;
-            color: #ffffff;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+            color: #0d47a1;
             letter-spacing: 1px;
         }
 
-        /* 認證金屬章（改接在平台名稱右邊） */
+        /* 認證金屬章 */
         .cert-badge {
-            width: 38px;
+            width: 88px;
             height: 38px;
             background: radial-gradient(circle, #f39c12, #d35400);
             border-radius: 50%;
@@ -210,11 +219,11 @@
             flex-shrink: 0;
         }
 
-        /* 日期置中 */
+        /* 日期置中 (改為深藍色字體) */
         .cert-date {
             font-size: 15px;
-            color: #e0f2f1;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+            font-weight: bold;
+            color: #1565c0;
             text-align: center;
             letter-spacing: 1px;
         }
@@ -270,29 +279,43 @@
 <body>
 
 <div class="container">
-    <h1>台灣小百岳踩點查詢</h1>
+    <h1>台灣小百岳完登挑戰</h1>
     
     <div class="search-box">
-        <input type="text" id="nicknameInput" placeholder="請輸入暱稱（例如：小明）">
-        <button onclick="searchUser()">查詢踩點紀錄</button>
+        <input type="text" id="nicknameInput" placeholder="請輸入暱稱（例如：大大，文華）">
+        <button onclick="searchUser()">查詢證書與紀錄</button>
     </div>
 
     <div id="statusMessage" class="status-message"></div>
 
     <!-- 獎狀證書區塊 -->
     <div id="certificate" class="certificate-container">
-        <!-- 右側 AI 繪製風格的臺灣地形山脈地圖背景 -->
-        <svg class="taiwan-map-bg" viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg">
+        <!-- 左側 AI 繪製風格的臺灣地形山脈地圖背景（向右漸隱） -->
+        <svg class="taiwan-map-bg left-map" viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg">
             <defs>
-                <linearGradient id="landGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <linearGradient id="landGradLeft" x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stop-color="#1b4332" stop-opacity="0.7"/>
                     <stop offset="50%" stop-color="#2d6a4f" stop-opacity="0.9"/>
                     <stop offset="100%" stop-color="#081c15" stop-opacity="0.8"/>
                 </linearGradient>
             </defs>
-            <!-- 臺灣島嶼輪廓 -->
-            <path d="M110,20 C130,35 155,70 160,110 C165,150 150,200 135,250 C120,300 95,340 85,370 C75,380 65,375 60,350 C50,310 40,260 45,210 C50,160 70,100 85,50 C95,20 100,10 110,20 Z" fill="url(#landGrad)" />
-            <!-- 中央山脈與脊樑山地等高褶皺線 -->
+            <path d="M110,20 C130,35 155,70 160,110 C165,150 150,200 135,250 C120,300 95,340 85,370 C75,380 65,375 60,350 C50,310 40,260 45,210 C50,160 70,100 85,50 C95,20 100,10 110,20 Z" fill="url(#landGradLeft)" />
+            <path d="M100,40 C115,70 120,120 125,170 C120,220 105,270 85,330" fill="none" stroke="#74c69d" stroke-width="2.5" stroke-dasharray="4,2" />
+            <path d="M90,60 C105,90 110,140 112,190 C108,240 92,290 78,340" fill="none" stroke="#b7e4c7" stroke-width="1.8" />
+            <path d="M112,80 C128,120 132,160 130,210 C122,250 110,280 92,320" fill="none" stroke="#52b788" stroke-width="1.5" />
+            <path d="M80,80 C90,110 95,150 92,190 C88,230 75,270 68,300" fill="none" stroke="#d8f3dc" stroke-width="1.2" />
+        </svg>
+
+        <!-- 右側 AI 繪製風格的臺灣地形山脈地圖背景（向左漸隱） -->
+        <svg class="taiwan-map-bg right-map" viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="landGradRight" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#1b4332" stop-opacity="0.7"/>
+                    <stop offset="50%" stop-color="#2d6a4f" stop-opacity="0.9"/>
+                    <stop offset="100%" stop-color="#081c15" stop-opacity="0.8"/>
+                </linearGradient>
+            </defs>
+            <path d="M110,20 C130,35 155,70 160,110 C165,150 150,200 135,250 C120,300 95,340 85,370 C75,380 65,375 60,350 C50,310 40,260 45,210 C50,160 70,100 85,50 C95,20 100,10 110,20 Z" fill="url(#landGradRight)" />
             <path d="M100,40 C115,70 120,120 125,170 C120,220 105,270 85,330" fill="none" stroke="#74c69d" stroke-width="2.5" stroke-dasharray="4,2" />
             <path d="M90,60 C105,90 110,140 112,190 C108,240 92,290 78,340" fill="none" stroke="#b7e4c7" stroke-width="1.8" />
             <path d="M112,80 C128,120 132,160 130,210 C122,250 110,280 92,320" fill="none" stroke="#52b788" stroke-width="1.5" />
@@ -309,11 +332,11 @@
             <div class="cert-footer-group">
                 <!-- 平台名稱與認證圓圈同列 -->
                 <div class="cert-org-row">
-                    <div class="cert-org">MySports 運動社群平台</div>
-                    <div class="cert-badge">認證</div>
+                    <div class="cert-org">MySports運動社群平台</div>
+                    <div class="cert-badge">MySports</div>
                 </div>
                 <!-- 日期置於下一列 -->
-                <div class="cert-date">2026 年</div>
+                <div class="cert-date">2026 年 7 月 31 日</div>
             </div>
         </div>
     </div>
