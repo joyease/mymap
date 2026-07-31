@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>台灣小百岳踩點查詢</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 25px;
+        }
+
+        /* 查詢區塊 */
+        .search-box {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        input[type="text"] {
+            padding: 10px 15px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            width: 250px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #2e7d32;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #1b5e20;
+        }
+
+        .status-message {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+            min-height: 24px;
+        }
+
+        /* 縣市區塊與山嶽圓圈 */
+        .county-group {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .county-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #34495e;
+            margin-bottom: 12px;
+        }
+
+        .mountains-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .mountain-circle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 85px;
+            height: 85px;
+            border-radius: 50%;
+            background-color: #e0e0e0; /* 預設淺灰色 */
+            color: #424242;
+            font-size: 13px;
+            font-weight: 500;
+            text-align: center;
+            padding: 8px;
+            box-sizing: border-box;
+            word-break: break-all;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* 去過的山嶽樣式 */
+        .mountain-circle.visited {
+            background-color: #4caf50; /* 綠色 */
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>台灣小百岳踩點查詢</h1>
+    
+    <div class="search-box">
+        <input type="text" id="nicknameInput" placeholder="請輸入暱稱（例如：小明）">
+        <button onclick="searchUser()">查詢踩點紀錄</button>
+    </div>
+
+    <div id="statusMessage" class="status-message"></div>
+
+    <div id="mountainsList"></div>
+</div>
+
+<script>
+    // 1. 100座山嶽資料（按筆劃縣市順序整理）
+    const mountainsData = [
+        { county: "台北市", name: "七星山" }, { county: "台北市", name: "二格山" }, { county: "台北市", name: "大屯山" }, { county: "台北市", name: "大崙頭山" }, { county: "台北市", name: "南港山" }, { county: "台北市", name: "劍潭山" },
+        { county: "台南市", name: "大凍山" }, { county: "台南市", name: "竹子尖山" }, { county: "台南市", name: "崜牛湖山" }, { county: "台南市", name: "崁頭山" },
+        { county: "台中市", name: "三汀山" }, { county: "台中市", name: "阿罩霧山" }, { county: "台中市", name: "南觀音山" }, { county: "台中市", name: "稍來山" }, { county: "台中市", name: "暗影山" }, { county: "台中市", name: "聚興山" }, { county: "台中市", name: "頭巃山" }, { county: "台中市", name: "鐵砧山" },
+        { county: "台東縣", name: "太麻里山" }, { county: "台東縣", name: "巴塱衛山" }, { county: "台東縣", name: "加奈美山" }, { county: "台東縣", name: "紅頭山" }, { county: "台東縣", name: "都蘭山" },
+        { county: "宜蘭縣", name: "三角崙山" }, { county: "宜蘭縣", name: "三星山" }, { county: "宜蘭縣", name: "鵲子山" }, { county: "宜蘭縣", name: "灣坑頭山" },
+        { county: "花蓮縣", name: "八里灣山" }, { county: "花蓮縣", name: "月眉山" }, { county: "花蓮縣", name: "卡拉寶山" }, { county: "花蓮縣", name: "立霧山" }, { county: "花蓮縣", name: "初音山" }, { county: "花蓮縣", name: "萬人山" }, { county: "花蓮縣", name: "鯉魚山" },
+        { county: "金門縣", name: "太武山" },
+        { county: "南投縣", name: "九份二山" }, { county: "南投縣", name: "大橫屏山" }, { county: "南投縣", name: "松柏坑山" }, { county: "南投縣", name: "金柑樹山" }, { county: "南投縣", name: "後尖山" }, { county: "南投縣", name: "集集大山" }, { county: "南投縣", name: "鳳凰山" }, { county: "南投縣", name: "貓囒山" },
+        { county: "屏東縣", name: "大山母山" }, { county: "屏東縣", name: "女乃山" }, { county: "屏東縣", name: "尾寮山" }, { county: "屏東縣", name: "里龍山" }, { county: "屏東縣", name: "笠頂山" }, { county: "屏東縣", name: "棚集山" },
+        { county: "苗栗縣", name: "火炎山" }, { county: "苗栗縣", name: "仙山" }, { county: "苗栗縣", name: "加里山" }, { county: "苗栗縣", name: "向天湖山" }, { county: "苗栗縣", name: "馬那邦山" }, { county: "苗栗縣", name: "關刀山" },
+        { county: "桃園市", name: "石門山" }, { county: "桃園市", name: "東眼山" }, { county: "桃園市", name: "金面山" }, { county: "桃園市", name: "溪洲山" },
+        { county: "基隆市", name: "大武崙山" }, { county: "基隆市", name: "姜子寮山" }, { county: "基隆市", name: "紅淡山" }, { county: "基隆市", name: "槓子寮山" },
+        { county: "連江縣", name: "雲台山" },
+        { county: "雲林縣", name: "石壁山" }, { county: "雲林縣", name: "雲嘉大尖山" },
+        { county: "新北市", name: "土庫岳" }, { county: "新北市", name: "大棟山" }, { county: "新北市", name: "五分山" }, { county: "新北市", name: "天上山" }, { county: "新北市", name: "汐止大尖山" }, { county: "新北市", name: "南勢角山" }, { county: "新北市", name: "基隆山" }, { county: "新北市", name: "獅仔頭山" }, { county: "新北市", name: "鳶山" }, { county: "新北市", name: "觀音山" },
+        { county: "新竹市", name: "18尖山" },
+        { county: "新竹縣", name: "五指山" }, { county: "新竹縣", name: "石牛山" }, { county: "新竹縣", name: "李棟山" }, { county: "新竹縣", name: "飛鳳山" }, { county: "新竹縣", name: "獅頭山" }, { county: "新竹縣", name: "鵝公髻山" },
+        { county: "嘉義市", name: "紅毛埤山" },
+        { county: "嘉義縣", name: "三腳南山" }, { county: "嘉義縣", name: "大凍山" }, { county: "嘉義縣", name: "大湖尖山" }, { county: "嘉義縣", name: "大塔山" }, { county: "嘉義縣", name: "梨子腳山" }, { county: "嘉義縣", name: "獨立山" },
+        { county: "彰化縣", name: "橫山" },
+        { county: "澎湖縣", name: "蛇頭山" },
+        { county: "高雄市", name: "大崗山" }, { county: "高雄市", name: "白雲山" }, { county: "高雄市", name: "西阿里關山" }, { county: "高雄市", name: "壽山" }, { county: "高雄市", name: "旗尾山" }, { county: "高雄市", name: "鳴海山" }, { county: "高雄市", name: "藤枝山" }, { county: "高雄市", name: "觀音山" }
+    ];
+
+    // 2. 使用者資料集（格式為 { name: "暱稱", record: [1,0,1...] }）
+    const usersData = [
+        {
+            name: "小明",
+            record: [
+                1,0,1,0,0,1,  // 台北市
+                1,0,0,1,      // 台南市
+                1,1,0,0,0,0,0,0, // 台中市
+                0,0,0,0,0,    // 台東縣
+                1,1,0,0,      // 宜蘭縣
+                0,0,0,0,0,0,0,// 花蓮縣
+                0,            // 金門縣
+                1,0,0,1,0,0,0,0, // 南投縣
+                0,0,0,0,0,0,  // 屏東縣
+                1,1,1,0,0,0,  // 苗栗縣
+                1,0,0,0,      // 桃園市
+                1,0,0,0,      // 基隆市
+                0,            // 連江縣
+                0,0,          // 雲林縣
+                1,1,1,1,1,0,0,0,0,0, // 新北市
+                1,            // 新竹市
+                1,0,0,0,0,0,  // 新竹縣
+                0,            // 嘉義市
+                0,0,0,0,0,0,  // 嘉義縣
+                0,            // 彰化縣
+                0,            // 澎湖縣
+                1,0,0,1,0,0,0,0  // 高雄市
+            ]
+        },
+        {
+            name: "阿華",
+            record: new Array(100).fill(1) // 全滿冠王範例
+        }
+    ];
+
+    // 初始化畫面：依縣市渲染所有山嶽圓圈
+    function renderMountains() {
+        const listContainer = document.getElementById('mountainsList');
+        listContainer.innerHTML = '';
+
+        // 將山嶽按縣市分組
+        const grouped = {};
+        mountainsData.forEach((mountain, index) => {
+            if (!grouped[mountain.county]) {
+                grouped[mountain.county] = [];
+            }
+            grouped[mountain.county].push({ name: mountain.name, globalIndex: index });
+        });
+
+        // 生成每個縣市的區塊與圓圈
+        for (const county in grouped) {
+            const groupDiv = document.createElement('div');
+            groupDiv.className = 'county-group';
+
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'county-title';
+            titleDiv.innerText = `${county}（${grouped[county].length}座）`;
+            groupDiv.appendChild(titleDiv);
+
+            const containerDiv = document.createElement('div');
+            containerDiv.className = 'mountains-container';
+
+            grouped[county].forEach(item => {
+                const circle = document.createElement('div');
+                circle.className = 'mountain-circle';
+                circle.innerText = item.name;
+                circle.id = `mountain-${item.globalIndex}`;
+                containerDiv.appendChild(circle);
+            });
+
+            groupDiv.appendChild(containerDiv);
+            listContainer.appendChild(groupDiv);
+        }
+    }
+
+    // 查詢使用者並更換圓圈顏色
+    function searchUser() {
+        const inputName = document.getElementById('nicknameInput').value.trim();
+        const statusEl = document.getElementById('statusMessage');
+
+        // 先重置所有圓圈為淺灰色
+        document.querySelectorAll('.mountain-circle').forEach(circle => {
+            circle.classList.remove('visited');
+        });
+
+        if (!inputName) {
+            statusEl.style.color = '#d32f2f';
+            statusEl.innerText = '請輸入暱稱！';
+            return;
+        }
+
+        const user = usersData.find(u => u.name === inputName);
+
+        if (user) {
+            let count = 0;
+            user.record.forEach((status, index) => {
+                if (status === 1) {
+                    const circle = document.getElementById(`mountain-${index}`);
+                    if (circle) {
+                        circle.classList.add('visited');
+                        count++;
+                    }
+                }
+            });
+            statusEl.style.color = '#2e7d32';
+            statusEl.innerText = `找到「${user.name}」的紀錄！已完成 ${count} / 100 座小百岳。`;
+        } else {
+            statusEl.style.color = '#d32f2f';
+            statusEl.innerText = `找不到暱稱「${inputName}」的資料。`;
+        }
+    }
+
+    // 支援按 Enter 鍵直接查詢
+    document.getElementById('nicknameInput').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            searchUser();
+        }
+    });
+
+    // 頁面載入完成後執行初始化
+    window.onload = renderMountains;
+</script>
+
+</body>
+</html>
