@@ -137,7 +137,7 @@
 </div>
 
 <script>
-    // 1. 100座山嶽資料（按筆劃縣市順序整理）
+    // 100座山嶽清單（按筆劃縣市順序）
     const mountainsData = [
         { county: "台北市", name: "七星山" }, { county: "台北市", name: "二格山" }, { county: "台北市", name: "大屯山" }, { county: "台北市", name: "大崙頭山" }, { county: "台北市", name: "南港山" }, { county: "台北市", name: "劍潭山" },
         { county: "台南市", name: "大凍山" }, { county: "台南市", name: "竹子尖山" }, { county: "台南市", name: "崜牛湖山" }, { county: "台南市", name: "崁頭山" },
@@ -163,56 +163,39 @@
         { county: "高雄市", name: "大崗山" }, { county: "高雄市", name: "白雲山" }, { county: "高雄市", name: "西阿里關山" }, { county: "高雄市", name: "壽山" }, { county: "高雄市", name: "旗尾山" }, { county: "高雄市", name: "鳴海山" }, { county: "高雄市", name: "藤枝山" }, { county: "高雄市", name: "觀音山" }
     ];
 
-    // 2. 使用者資料集（格式為 { name: "暱稱", record: [1,0,1...] }）
-    const usersData = [
-        {
-            name: "小明",
-            record: [
-                1,0,1,0,0,1,  // 台北市
-                1,0,0,1,      // 台南市
-                1,1,0,0,0,0,0,0, // 台中市
-                0,0,0,0,0,    // 台東縣
-                1,1,0,0,      // 宜蘭縣
-                0,0,0,0,0,0,0,// 花蓮縣
-                0,            // 金門縣
-                1,0,0,1,0,0,0,0, // 南投縣
-                0,0,0,0,0,0,  // 屏東縣
-                1,1,1,0,0,0,  // 苗栗縣
-                1,0,0,0,      // 桃園市
-                1,0,0,0,      // 基隆市
-                0,            // 連江縣
-                0,0,          // 雲林縣
-                1,1,1,1,1,0,0,0,0,0, // 新北市
-                1,            // 新竹市
-                1,0,0,0,0,0,  // 新竹縣
-                0,            // 嘉義市
-                0,0,0,0,0,0,  // 嘉義縣
-                0,            // 彰化縣
-                0,            // 澎湖縣
-                1,0,0,1,0,0,0,0  // 高雄市
-            ]
-        },
-        {
-            name: "阿華",
-            record: new Array(100).fill(1) // 全滿冠王範例
-        }
-    ];
+    let usersData = []; // 用於存放非同步讀取進來的 JSON 資料
 
-    // 初始化畫面：依縣市渲染所有山嶽圓圈
+    // 初始化：載入 JSON 資料與渲染畫面
+    async function init() {
+        renderMountains();
+        await loadUserData();
+    }
+
+    // 從外部 users.json 載入使用者資料
+    async function loadUserData() {
+        const statusEl = document.getElementById('statusMessage');
+        try {
+            const response = await fetch('https://joyease.github.io/mymap/2608small100users.json');
+            if (!response.ok) throw new Error('無法讀取 users.json');
+            usersData = await response.json();
+        } catch (error) {
+            console.error('載入資料錯誤：', error);
+            statusEl.style.color = '#d32f2f';
+            statusEl.innerText = '讀取 users.json 失敗，請確認檔案路徑或透過 Web Server 開啟。';
+        }
+    }
+
+    // 渲染山嶽 UI
     function renderMountains() {
         const listContainer = document.getElementById('mountainsList');
         listContainer.innerHTML = '';
 
-        // 將山嶽按縣市分組
         const grouped = {};
         mountainsData.forEach((mountain, index) => {
-            if (!grouped[mountain.county]) {
-                grouped[mountain.county] = [];
-            }
+            if (!grouped[mountain.county]) grouped[mountain.county] = [];
             grouped[mountain.county].push({ name: mountain.name, globalIndex: index });
         });
 
-        // 生成每個縣市的區塊與圓圈
         for (const county in grouped) {
             const groupDiv = document.createElement('div');
             groupDiv.className = 'county-group';
@@ -238,12 +221,12 @@
         }
     }
 
-    // 查詢使用者並更換圓圈顏色
+    // 查詢使用者
     function searchUser() {
         const inputName = document.getElementById('nicknameInput').value.trim();
         const statusEl = document.getElementById('statusMessage');
 
-        // 先重置所有圓圈為淺灰色
+        // 重置圓圈顏色
         document.querySelectorAll('.mountain-circle').forEach(circle => {
             circle.classList.remove('visited');
         });
@@ -254,36 +237,31 @@
             return;
         }
 
-        const user = usersData.find(u => u.name === inputName);
+        const user = usersData.find(u => u.nickname === inputName);
 
         if (user) {
-            let count = 0;
             user.record.forEach((status, index) => {
                 if (status === 1) {
                     const circle = document.getElementById(`mountain-${index}`);
-                    if (circle) {
-                        circle.classList.add('visited');
-                        count++;
-                    }
+                    if (circle) circle.classList.add('visited');
                 }
             });
             statusEl.style.color = '#2e7d32';
-            statusEl.innerText = `找到「${user.name}」的紀錄！已完成 ${count} / 100 座小百岳。`;
+            // 優先讀取 JSON 內的 count 欄位，若無則依陣列計算
+            const displayCount = user.count !== undefined ? user.count : user.record.filter(x => x === 1).length;
+            statusEl.innerText = `找到「${user.nickname}」的紀錄！已完成 ${displayCount} / 100 座小百岳。`;
         } else {
             statusEl.style.color = '#d32f2f';
             statusEl.innerText = `找不到暱稱「${inputName}」的資料。`;
         }
     }
 
-    // 支援按 Enter 鍵直接查詢
+    // Enter 鍵監聽
     document.getElementById('nicknameInput').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-            searchUser();
-        }
+        if (e.key === 'Enter') searchUser();
     });
 
-    // 頁面載入完成後執行初始化
-    window.onload = renderMountains;
+    window.onload = init;
 </script>
 
 </body>
